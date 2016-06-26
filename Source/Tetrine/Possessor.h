@@ -75,7 +75,7 @@ public:
 	FVector2D GetHorizontalMovement();
 
 	TArray<FVector2D> Obtain2DBlockPositions();
-	bool CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> newPositions);
+	bool CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> *newPositions);
 	void ApplyRotation(TArray<FVector2D> newPositions);
 	TArray<FVector2D> WallKick(TArray<FVector2D> newPositions);
 	

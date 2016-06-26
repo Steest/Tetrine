@@ -70,19 +70,32 @@ void APossessor::Tick(float DeltaTime)
 			bHasTetrominoLanded = false;
 		}
 
-		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime); }
-		UpdateFallElapsed(DeltaTime);
-		if (bHasTetrominoLanded) { UpdateLandedElapsed(DeltaTime); }
 
 		if (bRotateKeyPressed)
 		{
 			TArray<FVector2D> oldPositions = Obtain2DBlockPositions();
+				for (int i = 0;i < 4; ++i)
+			UE_LOG(Possessor_log, Log, TEXT("OLD position[%d] : (%f, %f)"), i, oldPositions[i].Y, oldPositions[i].X);
 			TArray<FVector2D> newPositions;
-			if (CanRotate(oldPositions, newPositions))
+			if (CanRotate(oldPositions, &newPositions))
 			{
+				if (newPositions.Num() > 0)
+				{
+					UE_LOG(Possessor_log, Log, TEXT("newPositions size: %d"), newPositions.Num());
+					for (int i = 0;i < 4; ++i)
+						UE_LOG(Possessor_log, Log, TEXT("NEW position[%d] : (%f, %f)"),i, newPositions[i].Y, newPositions[i].X);
+				}
+				else
+				{
+					UE_LOG(Possessor_log, Log, TEXT("newPositions is empty"));
+				}
 				ApplyRotation(newPositions);
 			}
 		}
+
+		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime); }
+		UpdateFallElapsed(DeltaTime);
+		if (bHasTetrominoLanded) { UpdateLandedElapsed(DeltaTime); }
 	}
 	else
 	{
@@ -92,13 +105,14 @@ void APossessor::Tick(float DeltaTime)
 
 		CurrentTetromino = SpawnTetromino();
 		if (CurrentTetromino == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Tetro2 == nullptr")); return; }
-		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+		//CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+		CurrentTetromino->SpawnShape("t");
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 
 		NextTetromino = GenerateRandomTetromino();
 		bHasMatchStarted = true;
 
-		blockOriginPosition = CurrentTetromino->blocks[1]->GetPosition();
+		blockOriginPosition = CurrentTetromino->blocks[2]->GetPosition();
 	}
 }
 
@@ -281,7 +295,7 @@ FVector2D APossessor::GetHorizontalMovement()
 	else { return FVector2D(0, 0); }
 }
 
-bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> newPositions)
+bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> *newPositions)
 {
 	TArray<FVector2D> positionsToCalculate;
 	//step 1. subtract from origin position.
@@ -292,12 +306,14 @@ bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> new
 	}
 
 	//step 2. multiply by rotation matrix.
+	//[0 -1] [ height ]    =   [newHeight = 0 * height + -1 * width]   = [height, width]
+	//[1  0] [ width ]	   =   [newWidth = 1 * height + 0 * width ]
 	for (int i = 0;i < 4; ++i)
 	{
 		FVector2D offsetPosition = positionsToCalculate[i];
 		float newRow = rotationMatrix[0].X * offsetPosition.Y + rotationMatrix[0].Y * offsetPosition.X;
 		float newCol = rotationMatrix[1].X * offsetPosition.Y + rotationMatrix[1].Y * offsetPosition.X;
-		positionsToCalculate[i] = FVector2D(newRow,newCol);
+		positionsToCalculate[i] = FVector2D(newRow, newCol);
 	}
 
 	//step 3. add origin position to the product of each block position calculated in step 2
@@ -306,21 +322,33 @@ bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> new
 		positionsToCalculate[i] = positionsToCalculate[i] + blockOriginPosition;
 	}
 
-	for (int i = 0;i < 4;++i)
-	{
-		newPositions.Add(positionsToCalculate[i]);
-	}
+	//for (int i = 0;i < 4;++i)
+	//{
+	//	newPositions->Emplace(positionsToCalculate[i]);
+	//}
+
+	newPositions->Append(positionsToCalculate);
 
 	//check if any of the newpositions overlap with existing blocks on grid.
 	//if blocks overlap..... return false
 
-	return false;
+	return true;
 }
 void APossessor::ApplyRotation(TArray<FVector2D> newPositions)
 {
+	//TArray<FVector2D> oldPositions(Obtain2DBlockPositions());
+	for (int i = 0; i < 4; ++i) // remove old block image
+	{
+		FVector2D oldPosition = CurrentTetromino->blocks[i]->GetPosition();
+		grid->GetBlock(oldPosition)->SetBlockStatus(0); // remember grid has matrix, and tetromino has separate set of blocks
+		grid->GetBlock(oldPosition)->SetBlockSprite(0);
+	}
+
 	for (int i = 0;i < 4; ++i)
 	{
-		FVector rotatedPosition = CurrentTetromino->blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 0, newPositions[i].Y);
+		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
+		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
+		FVector rotatedPosition = CurrentTetromino->blocks[i]->GetDimensions().X * FVector(newPositions[i].Y, 0, newPositions[i].X);
 		CurrentTetromino->blocks[i]->SetActorLocation(rotatedPosition);
 	}
 }
