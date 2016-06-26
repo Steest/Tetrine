@@ -23,31 +23,31 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	class AGrid* grid;
 	UPROPERTY(EditAnywhere, Category = "Camera")
-		UCameraComponent* MainCamera;
+	UCameraComponent* MainCamera;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
-		FString NextTetromino;
+	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
-		FString DebugString;
+	FString DebugString;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float FallTimeLimit;
+	float FallTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float FallTimeElapsed;
+	float FallTimeElapsed;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float FastFallTimeLimit;
+	float FastFallTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float FastFallTimeElapsed;
+	float FastFallTimeElapsed;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float HorizontalTimeLimit;
+	float HorizontalTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float HorizontalTimeElapsed;
+	float HorizontalTimeElapsed;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float FastHorizTimeLimit;
+	float FastHorizTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float FastHorizTimeElapsed;
+	float FastHorizTimeElapsed;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float LandedTimeLimit;
+	float LandedTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float LandedTimeElapsed;
+	float LandedTimeElapsed;
 	float PreviousHorizontalMove;
 	float CurrentHorizontalMove;
 	bool bIsFastHorizontal;
@@ -55,7 +55,7 @@ public:
 	bool bIsFastFall;
 	bool bHasTetrominoLanded;
 	UPROPERTY(EditAnywhere, Category = "Game")
-		bool bHasMatchStarted;
+	bool bHasMatchStarted;
 
 
 	// methods

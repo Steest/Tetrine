@@ -211,8 +211,14 @@ void APossessor::UpdateLandedElapsed(float deltaTime)
 	LandedTimeElapsed += deltaTime;
 	if (HasReachedTimeLimit(LandedTimeElapsed, LandedTimeLimit))
 	{
-		CurrentTetromino->EndLife(grid);
-		CurrentTetromino = nullptr;
+		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true) // block must be below in order to drop block
+		{
+			CurrentTetromino->EndLife(grid);
+			CurrentTetromino = nullptr;
+		}
+		LandedTimeElapsed = 0.0f;
+		bHasTetrominoLanded = false;
+		FallTimeElapsed = 0.0f;
 	}
 }
 
