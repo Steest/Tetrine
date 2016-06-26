@@ -12,7 +12,7 @@ AGrid::AGrid()
 	PrimaryActorTick.bCanEverTick = false;
 
 	width = 10;
-	height = 20;
+	height = 21;
 
 	GridComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("GridComponent"));
 	RootComponent = GridComponent;
@@ -74,7 +74,7 @@ bool AGrid::DropBlock(ABlock* block)
 
 int32 AGrid::GetHeight()
 {
-	return height;
+	return height-1;
 }
 
 int32 AGrid::GetWidth()
@@ -115,7 +115,39 @@ bool AGrid::ShouldDeleteRow(int8 row)
 	return true;
 }
 
-void AGrid::DropRows(int8 rowsToDrop)
+void AGrid::DropRows()
 {
+	for (int i = 0; i < GetHeight(); ++i) 
+	{
+		if(IsRowEmpty(i))
+		{
+			int8 DropFromRow = i+1; // in case the row above is empty, we seek the first row (above this row) that has blocks to drop
+			while (IsRowEmpty(DropFromRow) && DropFromRow < GetHeight()){ ++DropFromRow; }
+			int8 j = i;
+			while (DropFromRow < GetHeight() + 1)
+			{ 
+				TransferRow(DropFromRow,j);
+				++DropFromRow;
+				++j;
+			}
+		}
+	}
+}
 
+bool AGrid::IsRowEmpty(int8 row)
+{
+	for (int i = 0; i < GetWidth(); ++i)
+	{
+		if (matrix[i][row]->GetBlockStatus() != 0) { return false; }
+	}
+	return true;
+}
+
+void AGrid::TransferRow(int8 FromRow, int8 ToRow)
+{
+	for (int i = 0; i < GetWidth(); ++i)
+	{
+		matrix[i][ToRow]->SetBlockStatus(matrix[i][FromRow]->GetBlockStatus());
+		matrix[i][ToRow]->SetBlockSprite(matrix[i][FromRow]->GetBlockStatus());
+	}
 }

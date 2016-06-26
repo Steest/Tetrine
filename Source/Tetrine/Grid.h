@@ -33,5 +33,7 @@ public:
 	class ABlock* SpawnBlock();
 	void DeleteRow(int8 row);
 	bool ShouldDeleteRow(int8 row);
-	void DropRows(int8 rowsToDrop);
+	void DropRows();
+	bool IsRowEmpty(int8 row);
+	void TransferRow(int8 fromRow, int8 toRow);
 };
