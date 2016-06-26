@@ -39,8 +39,8 @@ APossessor::APossessor()
 	FastHorizTimeLimit = 0.05f;
 	LandedTimeLimit = 0.5f;
 
-	rotationMatrix.Add(FVector2D(0, -1));
-	rotationMatrix.Add(FVector2D(1, 0));
+	rotationMatrix.Emplace(FVector2D(0, -1));
+	rotationMatrix.Emplace(FVector2D(1, 0));
 }
 
 // Called when the game starts or when spawned
@@ -68,6 +68,7 @@ void APossessor::Tick(float DeltaTime)
 			NextTetromino = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
+			blockPivotPosition = CurrentTetromino->GetPivotPosition();
 		}
 
 
@@ -112,7 +113,7 @@ void APossessor::Tick(float DeltaTime)
 		NextTetromino = GenerateRandomTetromino();
 		bHasMatchStarted = true;
 
-		blockOriginPosition = CurrentTetromino->blocks[2]->GetPosition();
+		blockPivotPosition = CurrentTetromino->GetPivotPosition();
 	}
 }
 
@@ -300,10 +301,16 @@ FVector2D APossessor::GetHorizontalMovement()
 bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> *newPositions)
 {
 	TArray<FVector2D> positionsToCalculate;
+
+	UE_LOG(Possessor_log, Log, TEXT("Rotation Matrix: %s"), *rotationMatrix[0].ToString());
+	UE_LOG(Possessor_log, Log, TEXT("Rotation Matrix: %s"), *rotationMatrix[1].ToString());
+	UE_LOG(Possessor_log, Log, TEXT("Block Pivot Position: %s"), *CurrentTetromino->GetPivotPosition().ToString());
 	//step 1. subtract from origin position.
 	for (int i = 0;i < 4; ++i)
 	{
-		FVector2D offsetPosition = oldPositions[i] - blockOriginPosition;
+		FVector2D offsetPosition;
+		offsetPosition = oldPositions[i] - CurrentTetromino->GetPivotPosition();
+		//UE_LOG(Possessor_log, Log, TEXT("SUBTRACT FROM ORIGIN %d: (%f,%f)"), i, offsetPosition.Y, offsetPosition.X);
 		positionsToCalculate.Add(offsetPosition);
 	}
 
@@ -313,23 +320,30 @@ bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> *ne
 	for (int i = 0;i < 4; ++i)
 	{
 		FVector2D offsetPosition = positionsToCalculate[i];
-		float newRow = rotationMatrix[0].X * offsetPosition.Y + rotationMatrix[0].Y * offsetPosition.X;
-		float newCol = rotationMatrix[1].X * offsetPosition.Y + rotationMatrix[1].Y * offsetPosition.X;
+		UE_LOG(Possessor_log, Log, TEXT("offsetPosition %d: %s"), i, *offsetPosition.ToString());
+		float newRow = rotationMatrix[0].X * offsetPosition.X + rotationMatrix[0].Y * offsetPosition.Y;
+		float newCol = rotationMatrix[1].X * offsetPosition.X + rotationMatrix[1].Y * offsetPosition.Y;
+		//UE_LOG(Possessor_log, Log, TEXT("Normalized vector %d: (%f, %f)"), i, newRow, newCol);
 		positionsToCalculate[i] = FVector2D(newRow, newCol);
+		UE_LOG(Possessor_log, Log, TEXT("Normalized vector %d: %s"), i, *positionsToCalculate[i].ToString());
 	}
+
+	//Possessor_log: offsetPosition 0: X=0.000 Y=1.000
+	
+	//Possessor_log: Normalized vector 0: x=0.000 Y=1.000
 
 	//step 3. add origin position to the product of each block position calculated in step 2
 	for (int i = 0;i < 4; ++i)
 	{
-		positionsToCalculate[i] = positionsToCalculate[i] + blockOriginPosition;
+		positionsToCalculate[i] = positionsToCalculate[i] + CurrentTetromino->GetPivotPosition();
 	}
 
-	//for (int i = 0;i < 4;++i)
-	//{
-	//	newPositions->Emplace(positionsToCalculate[i]);
-	//}
+	for (int i = 0;i < 4;++i)
+	{
+		newPositions->Emplace(positionsToCalculate[i]);
+	}
 
-	newPositions->Append(positionsToCalculate);
+	//newPositions->Append(positionsToCalculate);
 
 	//check if any of the newpositions overlap with existing blocks on grid.
 	//if blocks overlap..... return false
@@ -350,7 +364,7 @@ void APossessor::ApplyRotation(TArray<FVector2D> newPositions)
 	{
 		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
-		FVector rotatedPosition = CurrentTetromino->blocks[i]->GetDimensions().X * FVector(newPositions[i].Y, 0, newPositions[i].X);
+		FVector rotatedPosition = CurrentTetromino->blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 0, newPositions[i].Y);
 		CurrentTetromino->blocks[i]->SetActorLocation(rotatedPosition);
 	}
 }

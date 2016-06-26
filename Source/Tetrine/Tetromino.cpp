@@ -172,3 +172,8 @@ TArray<int8> ATetromino::GetTetrominoRows()
 	}
 	return resultingRows;
 }
+
+FVector2D ATetromino::GetPivotPosition()
+{
+	return blocks[2]->GetPosition();
+}

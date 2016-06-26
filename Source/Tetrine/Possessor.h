@@ -59,7 +59,7 @@ public:
 
 	bool bRotateKeyPressed;
 	TArray<FVector2D> blockPositions;
-	FVector2D blockOriginPosition;
+	FVector2D blockPivotPosition;
 	TArray<FVector2D> rotationMatrix;
 
 	// methods

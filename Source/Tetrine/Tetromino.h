@@ -31,4 +31,6 @@ public:
 	void SetBlocksVisibility(bool b);
 	void SetBlocksStatus(int8 blockStatus);
 	TArray<int8> GetTetrominoRows();
+
+	FVector2D GetPivotPosition();
 };
