@@ -57,6 +57,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Game")
 	bool bHasMatchStarted;
 
+	bool bRotateKeyPressed;
+	TArray<FVector2D> blockPositions;
+	FVector2D blockOriginPosition;
+	TArray<FVector2D> rotationMatrix;
 
 	// methods
 	class ATetromino* SpawnTetromino();
@@ -69,4 +73,13 @@ public:
 	void MoveHorizontal(float axisValue);
 	void MoveDown(float axisValue);
 	FVector2D GetHorizontalMovement();
+
+	TArray<FVector2D> Obtain2DBlockPositions();
+	bool CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> newPositions);
+	void ApplyRotation(TArray<FVector2D> newPositions);
+	TArray<FVector2D> WallKick(TArray<FVector2D> newPositions);
+	
+	void RotateKeyPressed();
+	void RotateKeyReleased();
+	void RotateKeyHeld();
 };

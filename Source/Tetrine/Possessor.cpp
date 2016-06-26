@@ -37,6 +37,9 @@ APossessor::APossessor()
 	HorizontalTimeLimit = 0.3f;
 	FastHorizTimeLimit = 0.05f;
 	LandedTimeLimit = 0.5f;
+
+	rotationMatrix.Add(FVector2D(0, -1));
+	rotationMatrix.Add(FVector2D(1, 0));
 }
 
 // Called when the game starts or when spawned
@@ -68,6 +71,16 @@ void APossessor::Tick(float DeltaTime)
 		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime); }
 		UpdateFallElapsed(DeltaTime);
 		if (bHasTetrominoLanded) { UpdateLandedElapsed(DeltaTime); }
+
+		if (bRotateKeyPressed)
+		{
+			TArray<FVector2D> oldPositions = Obtain2DBlockPositions();
+			TArray<FVector2D> newPositions;
+			if (CanRotate(oldPositions, newPositions))
+			{
+				ApplyRotation(newPositions);
+			}
+		}
 	}
 	else
 	{
@@ -82,6 +95,8 @@ void APossessor::Tick(float DeltaTime)
 
 		NextTetromino = GenerateRandomTetromino();
 		bHasMatchStarted = true;
+
+		blockOriginPosition = CurrentTetromino->blocks[1]->GetPosition();
 	}
 }
 
@@ -92,6 +107,10 @@ void APossessor::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 	InputComponent->BindAxis("MoveHorizontal", this, &APossessor::MoveHorizontal);
 	InputComponent->BindAxis("MoveDown", this, &APossessor::MoveDown);
+
+	InputComponent->BindAction("Rotate", EInputEvent::IE_Pressed, this, &APossessor::RotateKeyPressed);
+	InputComponent->BindAction("Rotate", EInputEvent::IE_Released, this, &APossessor::RotateKeyReleased);
+	InputComponent->BindAction("Rotate", EInputEvent::IE_Repeat, this, &APossessor::RotateKeyHeld);
 }
 
 AGrid* APossessor::SpawnGrid()
@@ -256,4 +275,83 @@ FVector2D APossessor::GetHorizontalMovement()
 	if (CurrentHorizontalMove > 0) { return FVector2D(1, 0); }
 	else if (CurrentHorizontalMove < 0) { return FVector2D(-1, 0); }
 	else { return FVector2D(0, 0); }
+}
+
+bool APossessor::CanRotate(TArray<FVector2D> oldPositions, TArray<FVector2D> newPositions)
+{
+	TArray<FVector2D> positionsToCalculate;
+	//step 1. subtract from origin position.
+	for (int i = 0;i < 4; ++i)
+	{
+		FVector2D offsetPosition = oldPositions[i] - blockOriginPosition;
+		positionsToCalculate.Add(offsetPosition);
+	}
+
+	//step 2. multiply by rotation matrix.
+	for (int i = 0;i < 4; ++i)
+	{
+		FVector2D offsetPosition = positionsToCalculate[i];
+		float newRow = rotationMatrix[0].X * offsetPosition.Y + rotationMatrix[0].Y * offsetPosition.X;
+		float newCol = rotationMatrix[1].X * offsetPosition.Y + rotationMatrix[1].Y * offsetPosition.X;
+		positionsToCalculate[i] = FVector2D(newRow,newCol);
+	}
+
+	//step 3. add origin position to the product of each block position calculated in step 2
+	for (int i = 0;i < 4; ++i)
+	{
+		positionsToCalculate[i] = positionsToCalculate[i] + blockOriginPosition;
+	}
+
+	for (int i = 0;i < 4;++i)
+	{
+		newPositions.Add(positionsToCalculate[i]);
+	}
+
+	//check if any of the newpositions overlap with existing blocks on grid.
+	//if blocks overlap..... return false
+
+	return false;
+}
+void APossessor::ApplyRotation(TArray<FVector2D> newPositions)
+{
+	for (int i = 0;i < 4; ++i)
+	{
+		FVector rotatedPosition = CurrentTetromino->blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 0, newPositions[i].Y);
+		CurrentTetromino->blocks[i]->SetActorLocation(rotatedPosition);
+	}
+}
+
+//returns a TArray of of FVector2D's that change the position of each block in the shape by 1 block cell.
+TArray<FVector2D> APossessor::WallKick(TArray<FVector2D> overlappedPositions)
+{
+	TArray<FVector2D> correctPositions;
+	for (int i = 0;i < 4; ++i)
+	{
+		float correctColumn = overlappedPositions[i].X - 1;
+		correctPositions.Add(FVector2D(correctColumn, overlappedPositions[i].Y));
+	}
+
+	return correctPositions;
+}
+
+TArray<FVector2D> APossessor::Obtain2DBlockPositions()
+{
+	TArray<FVector2D> blockPositions;
+	for (int i = 0;i < 4; ++i)
+		blockPositions.Add(CurrentTetromino->blocks[i]->GetPosition());
+	
+	return blockPositions;
+}
+
+void APossessor::RotateKeyPressed()
+{
+	bRotateKeyPressed = true;
+}
+void APossessor::RotateKeyReleased()
+{
+	bRotateKeyPressed = false;
+}
+void APossessor::RotateKeyHeld()
+{
+	bRotateKeyPressed = false;
 }
