@@ -26,10 +26,12 @@ public:
 	// methods
 	void GenerateMatrix(int scale);
 	bool DropBlock(class ABlock* block);
-	int32 UpdateMatrix();
 	int32 GetWidth();
 	int32 GetHeight();
 	class ABlock* GetBlock(FVector2D position);
 	void SetBlock(class ABlock* newBlock);
 	class ABlock* SpawnBlock();
+	void DeleteRow(int8 row);
+	bool ShouldDeleteRow(int8 row);
+	void DropRows(int8 rowsToDrop);
 };

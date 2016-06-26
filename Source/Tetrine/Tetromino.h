@@ -30,4 +30,5 @@ public:
 	void MoveTetrominoOnGrid(FVector2D movement, class AGrid* grid);
 	void SetBlocksVisibility(bool b);
 	void SetBlocksStatus(int8 blockStatus);
+	TArray<int8> GetTetrominoRows();
 };

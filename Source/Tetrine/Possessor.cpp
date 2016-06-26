@@ -29,6 +29,7 @@ APossessor::APossessor()
 	bIsFastFall = false;
 	bIsFastHorizontal = false;
 	bHasMatchStarted = false;
+	bHasTetrominoLanded = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -56,6 +57,7 @@ void APossessor::Tick(float DeltaTime)
 	if (bHasMatchStarted)
 	{
 		if (grid == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Grid1 == nullptr")); return; }
+
 		if (CurrentTetromino == nullptr)
 		{
 			CurrentTetromino = SpawnTetromino();
@@ -68,6 +70,7 @@ void APossessor::Tick(float DeltaTime)
 		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime); }
 		UpdateFallElapsed(DeltaTime);
 		if (bHasTetrominoLanded) { UpdateLandedElapsed(DeltaTime); }
+		
 	}
 	else
 	{
@@ -146,7 +149,7 @@ void APossessor::UpdateFallElapsed(float deltaTime)
 			}
 		}
 	}
-	else
+	else 
 	{
 		FallTimeElapsed += deltaTime;
 		if (HasReachedTimeLimit(FallTimeElapsed, FallTimeLimit))
@@ -213,6 +216,8 @@ void APossessor::UpdateLandedElapsed(float deltaTime)
 	{
 		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true) // block must be below in order to drop block
 		{
+			TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
+			DeleteRows(RowsToDelete);
 			CurrentTetromino->EndLife(grid);
 			CurrentTetromino = nullptr;
 		}
@@ -256,4 +261,25 @@ FVector2D APossessor::GetHorizontalMovement()
 	if (CurrentHorizontalMove > 0) { return FVector2D(1, 0); }
 	else if (CurrentHorizontalMove < 0) { return FVector2D(-1, 0); }
 	else { return FVector2D(0, 0); }
+}
+
+TArray<int8> APossessor::FilterForDeletion(TArray<int8> potentialRows)
+{
+	TArray<int8> resultingRows;
+	for (int i = 0; i < potentialRows.Num(); ++i)
+	{
+		if (grid->ShouldDeleteRow(potentialRows[i]))
+		{
+			resultingRows.AddUnique(potentialRows[i]);
+		}
+	}
+	return resultingRows;
+}
+
+void APossessor::DeleteRows(TArray<int8> deletionRows)
+{
+	for (int i = 0; i < deletionRows.Num(); ++i)
+	{
+		grid->DeleteRow(deletionRows[i]);
+	}
 }

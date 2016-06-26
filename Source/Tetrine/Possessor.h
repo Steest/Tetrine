@@ -69,4 +69,6 @@ public:
 	void MoveHorizontal(float axisValue);
 	void MoveDown(float axisValue);
 	FVector2D GetHorizontalMovement();
+	TArray<int8> FilterForDeletion(TArray<int8> potentialRows);
+	void DeleteRows(TArray<int8> deletionRows);
 };

@@ -162,3 +162,13 @@ void ATetromino::SetBlocksStatus(int8 blockStatus)
 	blocks[2]->SetBlockStatus(blockStatus);
 	blocks[3]->SetBlockStatus(blockStatus);
 }
+
+TArray<int8> ATetromino::GetTetrominoRows()
+{
+	TArray<int8> resultingRows;
+	for (int i = 0; i < 4; ++i)
+	{
+		resultingRows.AddUnique(blocks[i]->GetPosition().Y);
+	}
+	return resultingRows;
+}
