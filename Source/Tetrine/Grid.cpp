@@ -72,11 +72,6 @@ bool AGrid::DropBlock(ABlock* block)
 	return true;
 }
 
-int32 AGrid::UpdateMatrix()
-{
-	return 0;
-}
-
 int32 AGrid::GetHeight()
 {
 	return height;
@@ -100,4 +95,27 @@ void AGrid::SetBlock(ABlock* newBlock)
 ABlock* AGrid::SpawnBlock()
 {
 	return GetWorld()->SpawnActor<ABlock>(ABlock::StaticClass());
+}
+
+void AGrid::DeleteRow(int8 row)
+{
+	for (int i = 0; i < GetWidth(); ++i)
+	{
+		matrix[i][row]->SetBlockSprite(0);
+		matrix[i][row]->SetBlockStatus(0);
+	}
+}
+
+bool AGrid::ShouldDeleteRow(int8 row)
+{
+	for (int i = 0; i < GetWidth(); ++i)
+	{
+		if (matrix[i][row]->GetBlockStatus() == 0) { return false; }
+	}
+	return true;
+}
+
+void AGrid::DropRows(int8 rowsToDrop)
+{
+
 }

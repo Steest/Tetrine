@@ -82,4 +82,7 @@ public:
 	void RotateKeyPressed();
 	void RotateKeyReleased();
 	void RotateKeyHeld();
+
+	TArray<int8> FilterForDeletion(TArray<int8> potentialRows);
+	void DeleteRows(TArray<int8> deletionRows);
 };
