@@ -92,7 +92,8 @@ void APossessor::Tick(float DeltaTime)
 
 		CurrentTetromino = SpawnTetromino();
 		if (CurrentTetromino == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Tetro2 == nullptr")); return; }
-		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+		//CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+		CurrentTetromino->SpawnShape("square");
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 
 		NextTetromino = GenerateRandomTetromino();
@@ -127,6 +128,7 @@ ATetromino* APossessor::SpawnTetromino()
 
 FString APossessor::GenerateRandomTetromino()
 { // we know there are 7 different types of blocks
+	return  "flat";
 	float randy = FMath::RandRange(0.0f, 1.0f); // break up into evenly random block probabilities
 	if (randy < .143) { return "square"; }
 	else if (randy < .143 * 2) { return "right bicep"; }
@@ -235,8 +237,8 @@ void APossessor::UpdateLandedElapsed(float deltaTime)
 		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true) // block must be below in order to drop block
 		{
 			TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
-			DeleteRows(RowsToDelete);
 			CurrentTetromino->EndLife(grid);
+			DeleteRows(RowsToDelete);
 			CurrentTetromino = nullptr;
 		}
 		LandedTimeElapsed = 0.0f;
