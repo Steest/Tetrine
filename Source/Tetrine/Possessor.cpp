@@ -239,6 +239,7 @@ void APossessor::UpdateLandedElapsed(float deltaTime)
 			TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
 			CurrentTetromino->EndLife(grid);
 			DeleteRows(RowsToDelete);
+			grid->DropRows();
 			CurrentTetromino = nullptr;
 		}
 		LandedTimeElapsed = 0.0f;
