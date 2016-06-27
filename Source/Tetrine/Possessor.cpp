@@ -90,8 +90,13 @@ void APossessor::Tick(float DeltaTime)
 
 		CurrentTetromino = SpawnTetromino();
 		if (CurrentTetromino == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Tetro2 == nullptr")); return; }
+<<<<<<< HEAD
 		//CurrentTetromino->SpawnShape(GenerateRandomTetromino());
 		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+=======
+		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+		//CurrentTetromino->SpawnShape("flat");
+>>>>>>> origin/master
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 		OldGhostPositions = CurrentTetromino->GetPositions();
 		NextTetromino = GenerateRandomTetromino();
@@ -127,6 +132,10 @@ ATetromino* APossessor::SpawnTetromino()
 
 FString APossessor::GenerateRandomTetromino()
 { // we know there are 7 different types of blocks
+<<<<<<< HEAD
+=======
+	//return "flat";
+>>>>>>> origin/master
 	float randy = FMath::RandRange(0.0f, 1.0f); // break up into evenly random block probabilities
 	if (randy < .143) { return "square"; }
 	else if (randy < .143 * 2) { return "right bicep"; }
