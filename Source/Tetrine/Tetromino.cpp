@@ -130,11 +130,6 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 		grid->GetBlock(newPosition)->SetBlockSprite(2);
 
 		FVector newLocation = blocks[i]->GetDimensions().X*FVector(blocks[i]->GetPosition().X, 0, blocks[i]->GetPosition().Y);
-		//
-		// might need
-		// to swap
-		// Y and X
-		// in above newLocation
 		blocks[i]->SetActorLocation(newLocation);
 	}
 }
@@ -180,10 +175,6 @@ FVector2D ATetromino::GetPivotPosition()
 	return blocks[2]->GetPosition();
 }
 
-//
-// URGENT : STILL NEEDS TO CHECK UPPER BOUNDS WHEN SHIFTING IMMEDIATELY FROM SPAWN! IT CAN GO
-// OUT OF BOUNDS VERTICALLY
-//
 void ATetromino::ShiftPositions(TArray<FVector2D> &positions, AGrid* grid)
 {
 	int8 MinColumn = 0;
@@ -194,7 +185,6 @@ void ATetromino::ShiftPositions(TArray<FVector2D> &positions, AGrid* grid)
 		else if (positions[i].X < MinColumn) { MinColumn = positions[i].X; }
 	}
 
-	TArray<FVector2D> tempPositions;
 	if (MinColumn < 0)
 	{
 		for (int i = 0; i < positions.Num(); ++i)
@@ -204,10 +194,35 @@ void ATetromino::ShiftPositions(TArray<FVector2D> &positions, AGrid* grid)
 	}
 	else if (MaxColumn >= grid->GetWidth())
 	{
-		MaxColumn = grid->GetWidth() - MaxColumn + 1; // cant be equal to actual width
+		MaxColumn = MaxColumn - grid->GetWidth() + 1; // cant be equal to actual width
 		for (int i = 0; i < positions.Num(); ++i)
 		{
 			positions[i] = (FVector2D(positions[i].X - MaxColumn , positions[i].Y));
+		}
+	}
+
+
+	int8 MinRow = 0;
+	int8 MaxRow = 0;
+	for (int i = 0; i < positions.Num(); ++i)
+	{
+		if (positions[i].Y >= grid->GetHeight() && positions[i].Y > MaxRow) { MaxRow = positions[i].Y; }
+		else if (positions[i].Y < MinRow) { MinRow = positions[i].Y; }
+	}
+
+	if (MinRow < 0)
+	{
+		for (int i = 0; i < positions.Num(); ++i)
+		{
+			positions[i] = (FVector2D(positions[i].X , positions[i].Y - MinRow));
+		}
+	}
+	else if (MaxRow >= grid->GetHeight())
+	{
+		MaxRow = MaxRow - grid->GetHeight() + 1; // cant be equal to actual height (were subtracting)
+		for (int i = 0; i < positions.Num(); ++i)
+		{
+			positions[i] = (FVector2D(positions[i].X , positions[i].Y - MaxRow));
 		}
 	}
 }
