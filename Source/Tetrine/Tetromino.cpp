@@ -10,6 +10,8 @@ DEFINE_LOG_CATEGORY(Tetromino_log);
 ATetromino::ATetromino()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	rotationMatrix.Emplace(FVector2D(0, 1));
+	rotationMatrix.Emplace(FVector2D(-1, 0));
 }
 
 void ATetromino::BeginPlay() // we dont know which BeginPlay will fire first between this, possessor, tetromino, grid, blocks
@@ -176,4 +178,94 @@ TArray<int8> ATetromino::GetTetrominoRows()
 FVector2D ATetromino::GetPivotPosition()
 {
 	return blocks[2]->GetPosition();
+}
+
+//returns a TArray of of FVector2D's that change the position of each block in the shape by 1 block cell.
+TArray<FVector2D> ATetromino::WallKick(TArray<FVector2D> overlappedPositions)
+{
+	TArray<FVector2D> correctPositions;
+	for (int i = 0; i < 4; ++i)
+	{
+		float correctColumn = overlappedPositions[i].X - 1;
+		correctPositions.Add(FVector2D(correctColumn, overlappedPositions[i].Y));
+	}
+
+	return correctPositions;
+}
+
+void ATetromino::ShiftPositions(TArray<FVector2D> &positions, AGrid* grid)
+{
+	int8 MinColumn = 0;
+	int8 MaxColumn = 0;
+	for (int i = 0; i < positions.Num(); ++i)
+	{
+		if (positions[i].X >= grid->GetWidth() && positions[i].X > MaxColumn) { MaxColumn = positions[i].X; }
+		else if (positions[i].X < MinColumn) { MinColumn = positions[i].X; }
+	}
+
+	TArray<FVector2D> tempPositions;
+	if (MinColumn < 0)
+	{
+		for (int i = 0; i < positions.Num(); ++i)
+		{
+			positions[i] = (FVector2D(positions[i].X - MinColumn, positions[i].Y));
+		}
+	}
+	else if (MaxColumn >= grid->GetWidth())
+	{
+		MaxColumn = grid->GetWidth() - MaxColumn + 1; // cant be equal to actual width
+		for (int i = 0; i < positions.Num(); ++i)
+		{
+			positions[i] = (FVector2D(positions[i].X - MaxColumn , positions[i].Y));
+		}
+	}
+}
+
+bool ATetromino::CanShiftPositions(const TArray<FVector2D> &newPositions, AGrid* grid)
+{
+	for (int i = 0; i < newPositions.Num(); ++i)
+	{
+		if (grid->GetBlock(newPositions[i])->GetBlockStatus() == 1) { return false; }
+	}
+	return true;
+}
+
+void ATetromino::ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid)
+{
+	for (int i = 0; i < 4; ++i) // remove old block image
+	{
+		FVector2D oldPosition = blocks[i]->GetPosition();
+		grid->GetBlock(oldPosition)->SetBlockStatus(0); // remember grid has matrix, and tetromino has separate set of blocks
+		grid->GetBlock(oldPosition)->SetBlockSprite(0);
+	}
+
+	for (int i = 0; i < 4; ++i)
+	{
+		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
+		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
+		blocks[i]->SetPosition(newPositions[i]);
+
+		FVector rotatedPosition = blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 0, newPositions[i].Y);
+		blocks[i]->SetActorLocation(rotatedPosition);
+	}
+}
+
+TArray<FVector2D> ATetromino::CalculateRotation()
+{
+	TArray<FVector2D> RotatedPositions;
+	for (int i = 0; i < 4; ++i)
+	{
+		//step 1. subtract from pivot position to get block positions relative to origin
+		FVector2D offsetPosition = blocks[i]->GetPosition() - GetPivotPosition();
+
+		//step 2. multiply by rotation matrix to obtain rotation positions (relative to origin)
+		//[0 -1] [ height ]    =   [newHeight = 0 * height + -1 * width]   = [height, width]
+		//[1  0] [ width ]	   =   [newWidth = 1 * height + 0 * width ]
+		float newRow = rotationMatrix[0].X * offsetPosition.X + rotationMatrix[0].Y * offsetPosition.Y;
+		float newCol = rotationMatrix[1].X * offsetPosition.X + rotationMatrix[1].Y * offsetPosition.Y;
+
+		//step 3. add pivot position to the product of each new block position to obtain final position relative to pivot
+		RotatedPositions.Add( FVector2D(newRow, newCol) + GetPivotPosition() );
+	}
+	return RotatedPositions;
 }

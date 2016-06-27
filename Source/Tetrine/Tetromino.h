@@ -21,6 +21,8 @@ public:
 		TArray<class ABlock*> blocks;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 		FString DebugString;
+	TArray<FVector2D> OldTetrominoPositions;
+	TArray<FVector2D> rotationMatrix;
 
 	// methods
 	void EndLife(class AGrid* grid);
@@ -31,6 +33,10 @@ public:
 	void SetBlocksVisibility(bool b);
 	void SetBlocksStatus(int8 blockStatus);
 	TArray<int8> GetTetrominoRows();
-
 	FVector2D GetPivotPosition();
+	void ShiftPositions(TArray<FVector2D> &positions, AGrid* grid);
+	bool CanShiftPositions(const TArray<FVector2D> &newPositions, AGrid* grid);
+	TArray<FVector2D> CalculateRotation();
+	void ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid);
+	TArray<FVector2D> WallKick(TArray<FVector2D> newPositions);
 };
