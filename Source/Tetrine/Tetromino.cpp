@@ -201,7 +201,6 @@ void ATetromino::ShiftPositions(TArray<FVector2D> &positions, AGrid* grid)
 		}
 	}
 
-
 	int8 MinRow = 0;
 	int8 MaxRow = 0;
 	for (int i = 0; i < positions.Num(); ++i)
