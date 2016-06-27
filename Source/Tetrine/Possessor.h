@@ -57,9 +57,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Game")
 	bool bHasMatchStarted;
 
-	bool bRotateKeyPressed;
-	TArray<FVector2D> blockPositions;
-	FVector2D blockPivotPosition;
+	bool bIsRotating;
+	bool bIsRotationKeyHeld;
+	TArray<FVector2D> OldTetrominoPositions;
 	TArray<FVector2D> rotationMatrix;
 
 	// methods
@@ -81,7 +81,6 @@ public:
 	
 	void RotateKeyPressed();
 	void RotateKeyReleased();
-	void RotateKeyHeld();
 
 	TArray<int8> FilterForDeletion(TArray<int8> potentialRows);
 	void DeleteRows(TArray<int8> deletionRows);

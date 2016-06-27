@@ -68,30 +68,17 @@ void APossessor::Tick(float DeltaTime)
 			NextTetromino = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
-			blockPivotPosition = CurrentTetromino->GetPivotPosition();
 		}
 
-
-		if (bRotateKeyPressed)
+		if (bIsRotating)
 		{
 			TArray<FVector2D> oldPositions = Obtain2DBlockPositions();
-				for (int i = 0;i < 4; ++i)
-			UE_LOG(Possessor_log, Log, TEXT("OLD position[%d] : (%f, %f)"), i, oldPositions[i].Y, oldPositions[i].X);
 			TArray<FVector2D> newPositions;
 			if (CanRotate(oldPositions, &newPositions))
 			{
-				if (newPositions.Num() > 0)
-				{
-					UE_LOG(Possessor_log, Log, TEXT("newPositions size: %d"), newPositions.Num());
-					for (int i = 0;i < 4; ++i)
-						UE_LOG(Possessor_log, Log, TEXT("NEW position[%d] : (%f, %f)"),i, newPositions[i].Y, newPositions[i].X);
-				}
-				else
-				{
-					UE_LOG(Possessor_log, Log, TEXT("newPositions is empty"));
-				}
 				ApplyRotation(newPositions);
 			}
+			bIsRotating = false;
 		}
 
 		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime); }
@@ -112,8 +99,6 @@ void APossessor::Tick(float DeltaTime)
 
 		NextTetromino = GenerateRandomTetromino();
 		bHasMatchStarted = true;
-
-		blockPivotPosition = CurrentTetromino->GetPivotPosition();
 	}
 }
 
@@ -127,7 +112,6 @@ void APossessor::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 	InputComponent->BindAction("Rotate", EInputEvent::IE_Pressed, this, &APossessor::RotateKeyPressed);
 	InputComponent->BindAction("Rotate", EInputEvent::IE_Released, this, &APossessor::RotateKeyReleased);
-	InputComponent->BindAction("Rotate", EInputEvent::IE_Repeat, this, &APossessor::RotateKeyHeld);
 }
 
 AGrid* APossessor::SpawnGrid()
@@ -364,6 +348,7 @@ void APossessor::ApplyRotation(TArray<FVector2D> newPositions)
 	{
 		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
+		CurrentTetromino->blocks[i]->SetPosition(newPositions[i]);
 		FVector rotatedPosition = CurrentTetromino->blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 0, newPositions[i].Y);
 		CurrentTetromino->blocks[i]->SetActorLocation(rotatedPosition);
 	}
@@ -393,15 +378,12 @@ TArray<FVector2D> APossessor::Obtain2DBlockPositions()
 
 void APossessor::RotateKeyPressed()
 {
-	bRotateKeyPressed = true;
+	if (!bIsRotationKeyHeld && !bIsRotating) { bIsRotating = true; }
+	bIsRotationKeyHeld = true;
 }
 void APossessor::RotateKeyReleased()
 {
-	bRotateKeyPressed = false;
-}
-void APossessor::RotateKeyHeld()
-{
-	bRotateKeyPressed = false;
+	bIsRotationKeyHeld = false;
 }
 
 TArray<int8> APossessor::FilterForDeletion(TArray<int8> potentialRows)
