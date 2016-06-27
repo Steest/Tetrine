@@ -5,6 +5,7 @@
 #include "Tetromino.h"
 #include "Block.h"
 #include "Grid.h"
+#include "PaperSpriteComponent.h"
 
 DEFINE_LOG_CATEGORY(Possessor_log);
 // Sets default values
@@ -16,6 +17,8 @@ APossessor::APossessor()
 	//grid = nullptr;
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	RootComponent = MainCamera;
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> GhostSpriteAsset(TEXT("PaperSprite'/Game/Art/ghost_block_Sprite.ghost_block_Sprite'"));
+	GhostSprite = GhostSpriteAsset.Get();
 
 	NextTetromino = "none";
 	FallTimeElapsed = 0.0f;
@@ -26,10 +29,14 @@ APossessor::APossessor()
 	PreviousHorizontalMove = 0.0f;
 	CurrentHorizontalMove = 0.0f;
 
-	bIsFastFall = false;
-	bIsFastHorizontal = false;
-	bHasMatchStarted = false;
-	bHasTetrominoLanded = false;
+	bool bIsFastHorizontal = false;
+	bool bHasInitiatedHorizMove = false;
+	bool bIsFastFall = false;
+	bool bHasTetrominoLanded = false;
+	bool bHasMatchStarted = false;
+	bool bIsRotating = false;
+	bool bIsRotationKeyHeld = false;
+	bool bHasChangedPositions = true;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -65,21 +72,14 @@ void APossessor::Tick(float DeltaTime)
 			NextTetromino = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
+			bHasChangedPositions = true;
 		}
 
-		if (bIsRotating)
-		{
-			TArray<FVector2D> newPositions = CurrentTetromino->CalculateRotation();
-			CurrentTetromino->ShiftPositions(newPositions,grid);
-			if (CurrentTetromino->CanShiftPositions(newPositions,grid))
-			{
-				CurrentTetromino->ApplyRotation(newPositions,grid);
-			}
-			bIsRotating = false;
-		}
-
-		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime); }
+		if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
+		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true;}
 		UpdateFallElapsed(DeltaTime);
+		if (bHasChangedPositions) { UpdateGhostTetromino(); }
+		if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = false; bIsInstantDropped = false; }
 		if (bHasTetrominoLanded) { UpdateLandedElapsed(DeltaTime); }
 	}
 	else
@@ -93,9 +93,10 @@ void APossessor::Tick(float DeltaTime)
 		//CurrentTetromino->SpawnShape(GenerateRandomTetromino());
 		CurrentTetromino->SpawnShape("t");
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
-
+		OldGhostPositions = CurrentTetromino->GetPositions();
 		NextTetromino = GenerateRandomTetromino();
 		bHasMatchStarted = true;
+		bHasChangedPositions = true;
 	}
 }
 
@@ -109,6 +110,9 @@ void APossessor::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 	InputComponent->BindAction("Rotate", EInputEvent::IE_Pressed, this, &APossessor::RotateKeyPressed);
 	InputComponent->BindAction("Rotate", EInputEvent::IE_Released, this, &APossessor::RotateKeyReleased);
+
+	InputComponent->BindAction("InstantDrop", EInputEvent::IE_Pressed, this, &APossessor::InstantDropPressed);
+	InputComponent->BindAction("InstantDrop", EInputEvent::IE_Released, this, &APossessor::InstantDropReleased);
 }
 
 AGrid* APossessor::SpawnGrid()
@@ -308,4 +312,59 @@ void APossessor::DeleteRows(TArray<int8> deletionRows)
 	{
 		grid->DeleteRow(deletionRows[i]);
 	}
+}
+
+void APossessor::UpdateRotations()
+{
+	TArray<FVector2D> newPositions = CurrentTetromino->CalculateRotation();
+	CurrentTetromino->ShiftPositions(newPositions, grid);
+	if (CurrentTetromino->CanShiftPositions(newPositions, grid))
+	{
+		CurrentTetromino->ApplyRotation(newPositions, grid);
+	}
+	bIsRotating = false;
+}
+
+void APossessor::UpdateGhostTetromino()
+{
+	// remove the old ghost blocks
+	for (int i = 0; i < OldGhostPositions.Num(); ++i)
+	{
+		grid->GetBlock(OldGhostPositions[i])->SetBlockSprite(grid->GetBlock(OldGhostPositions[i])->GetBlockStatus());
+	}
+
+	TArray<FVector2D> GhostPositions = CurrentTetromino->GetPositions();
+	int i = -1;
+	while (!CurrentTetromino->DoesTetrominoCollide(FVector2D(0, i), grid)) { --i; }
+	for (int j = 0; j < 4; ++j)
+	{
+		OldGhostPositions[j] = GhostPositions[j] + FVector2D(0, i+1);
+		grid->GetBlock(OldGhostPositions[j])->BlockHitBox->SetSprite(GhostSprite);
+	}
+	bHasChangedPositions = false;
+}
+
+void APossessor::InstantDropPressed()
+{
+	if (!bIsInstantDropKeyHeld && !bIsInstantDropped) { bIsInstantDropped = true; }
+	bIsInstantDropKeyHeld = true;
+}
+
+void APossessor::InstantDropReleased()
+{
+	bIsInstantDropKeyHeld = false;
+}
+
+void APossessor::InstantDrop()
+{
+	for (int i = 0; i < OldGhostPositions.Num(); ++i)
+	{
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockStatus(0);
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockSprite(0);
+	
+		CurrentTetromino->blocks[i]->SetPosition(OldGhostPositions[i]);
+		CurrentTetromino->blocks[i]->SetActorLocation(CurrentTetromino->blocks[i]->GetDimensions().X * FVector(OldGhostPositions[i].X, 0, OldGhostPositions[i].Y));
+	}
+	CurrentTetromino->EndLife(grid);
+	CurrentTetromino = nullptr;
 }

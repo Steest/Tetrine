@@ -38,5 +38,5 @@ public:
 	bool CanShiftPositions(const TArray<FVector2D> &newPositions, AGrid* grid);
 	TArray<FVector2D> CalculateRotation();
 	void ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid);
-	TArray<FVector2D> WallKick(TArray<FVector2D> newPositions);
+	TArray<FVector2D> GetPositions();
 };

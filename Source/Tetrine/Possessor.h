@@ -24,6 +24,8 @@ public:
 	class AGrid* grid;
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	UCameraComponent* MainCamera;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	class UPaperSprite* GhostSprite;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
@@ -56,10 +58,12 @@ public:
 	bool bHasTetrominoLanded;
 	UPROPERTY(EditAnywhere, Category = "Game")
 	bool bHasMatchStarted;
-
 	bool bIsRotating;
 	bool bIsRotationKeyHeld;
-	
+	bool bIsInstantDropped;
+	bool bIsInstantDropKeyHeld;
+	bool bHasChangedPositions;
+	TArray<FVector2D> OldGhostPositions;
 
 	// methods
 	class ATetromino* SpawnTetromino();
@@ -76,4 +80,9 @@ public:
 	void RotateKeyReleased();
 	TArray<int8> FilterForDeletion(TArray<int8> potentialRows);
 	void DeleteRows(TArray<int8> deletionRows);
+	void UpdateRotations();
+	void UpdateGhostTetromino();
+	void InstantDropPressed();
+	void InstantDropReleased();
+	void InstantDrop();
 };

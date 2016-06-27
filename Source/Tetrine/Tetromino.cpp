@@ -180,19 +180,10 @@ FVector2D ATetromino::GetPivotPosition()
 	return blocks[2]->GetPosition();
 }
 
-//returns a TArray of of FVector2D's that change the position of each block in the shape by 1 block cell.
-TArray<FVector2D> ATetromino::WallKick(TArray<FVector2D> overlappedPositions)
-{
-	TArray<FVector2D> correctPositions;
-	for (int i = 0; i < 4; ++i)
-	{
-		float correctColumn = overlappedPositions[i].X - 1;
-		correctPositions.Add(FVector2D(correctColumn, overlappedPositions[i].Y));
-	}
-
-	return correctPositions;
-}
-
+//
+// URGENT : STILL NEEDS TO CHECK UPPER BOUNDS WHEN SHIFTING IMMEDIATELY FROM SPAWN! IT CAN GO
+// OUT OF BOUNDS VERTICALLY
+//
 void ATetromino::ShiftPositions(TArray<FVector2D> &positions, AGrid* grid)
 {
 	int8 MinColumn = 0;
@@ -268,4 +259,14 @@ TArray<FVector2D> ATetromino::CalculateRotation()
 		RotatedPositions.Add( FVector2D(newRow, newCol) + GetPivotPosition() );
 	}
 	return RotatedPositions;
+}
+
+TArray<FVector2D> ATetromino::GetPositions()
+{
+	TArray<FVector2D> resultingPositions;
+	for (int i = 0; i < 4; ++i)
+	{
+		resultingPositions.Add(blocks[i]->GetPosition());
+	}
+	return resultingPositions;
 }
