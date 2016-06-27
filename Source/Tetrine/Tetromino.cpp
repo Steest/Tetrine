@@ -48,54 +48,54 @@ ABlock* ATetromino::SpawnBlock()
 }
 
 void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bottom left to up right
-{
+{ // must ensure that the 3rd block(block # 2 = 3 in 0 index)
 	if (shape == "square")
 	{
 		blocks[0]->SetPosition(FVector2D(4, 18));
 		blocks[1]->SetPosition(FVector2D(5, 18));
-		blocks[2]->SetPosition(FVector2D(4, 19));
+		blocks[2]->SetPosition(FVector2D(4, 19)); // pivot (doesnt matter for square)
 		blocks[3]->SetPosition(FVector2D(5, 19));
 	}
 	else if (shape == "t")
 	{
 		blocks[0]->SetPosition(FVector2D(4, 19));
 		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 18));
+		blocks[2]->SetPosition(FVector2D(4, 18)); // pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
 	}
 	else if (shape == "z")
 	{
 		blocks[0]->SetPosition(FVector2D(3, 19));
-		blocks[1]->SetPosition(FVector2D(4, 19));
-		blocks[2]->SetPosition(FVector2D(4, 18));
+		blocks[1]->SetPosition(FVector2D(4, 18));
+		blocks[2]->SetPosition(FVector2D(4, 19)); //potentially messed up pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
 	}
 	else if (shape == "right bicep")
 	{
 		blocks[0]->SetPosition(FVector2D(5, 19));
 		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 18));
+		blocks[2]->SetPosition(FVector2D(4, 18)); // pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
 	}
 	else if (shape == "left bicep")
 	{
 		blocks[0]->SetPosition(FVector2D(3, 19));
 		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 18));
+		blocks[2]->SetPosition(FVector2D(4, 18)); //pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
 	}
 	else if (shape == "flat")
 	{
 		blocks[0]->SetPosition(FVector2D(3, 19));
-		blocks[1]->SetPosition(FVector2D(4, 19));
-		blocks[2]->SetPosition(FVector2D(5, 19));
+		blocks[1]->SetPosition(FVector2D(4, 19)); 
+		blocks[2]->SetPosition(FVector2D(5, 19)); // problem because rotates too much
 		blocks[3]->SetPosition(FVector2D(6, 19));
 	}
 	else if (shape == "s")
 	{
-		blocks[0]->SetPosition(FVector2D(4, 19));
-		blocks[1]->SetPosition(FVector2D(5, 19));
-		blocks[2]->SetPosition(FVector2D(3, 18));
+		blocks[0]->SetPosition(FVector2D(5, 19));
+		blocks[1]->SetPosition(FVector2D(3, 18));
+		blocks[2]->SetPosition(FVector2D(4, 19)); //; pivot
 		blocks[3]->SetPosition(FVector2D(4, 18));
 	}
 	else
