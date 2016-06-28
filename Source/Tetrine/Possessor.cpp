@@ -87,7 +87,7 @@ void APossessor::Tick(float DeltaTime)
 			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
 			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
 			if (bHasChangedPositions) { UpdateGhostTetromino(); }
-			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bIsPlayingArrowMiniGame = true; } 
+			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bIsPlayingArrowMiniGame = true; CalculateArrowSequence(); bIsKeyProcessed = true; } // new arrow needed for mini game
 		}
 		else 
 		{ 
@@ -267,6 +267,9 @@ void APossessor::MoveHorizontal(float axisValue)
 		bHasInitiatedHorizMove = false;
 		FastHorizTimeElapsed = 0.0f;
 		HorizontalTimeElapsed = 0.0f;
+
+		if (CurrentHorizontalMove > 0 && bIsKeyProcessed ) { CurrentArrow = "right"; bIsKeyProcessed = false; }
+		else if (CurrentHorizontalMove < 0 && bIsKeyProcessed ) { CurrentArrow = "left"; bIsKeyProcessed = false; }
 	}
 }
 
@@ -281,6 +284,7 @@ void APossessor::MoveDown(float axisValue)
 	{
 		bIsFastFall = true;
 		FallTimeElapsed = 0.0f;
+		if (CurrentArrow != "down" && bIsKeyProcessed) { CurrentArrow = "down"; bIsKeyProcessed = false; }
 	}
 }
 
@@ -294,6 +298,7 @@ FVector2D APossessor::GetHorizontalMovement()
 void APossessor::RotateKeyPressed()
 {
 	if (!bIsRotationKeyHeld && !bIsRotating) { bIsRotating = true; }
+	if (CurrentArrow != "up" && bIsKeyProcessed) { CurrentArrow = "up"; bIsKeyProcessed = false; }
 	bIsRotationKeyHeld = true;
 }
 void APossessor::RotateKeyReleased()
@@ -389,5 +394,40 @@ void APossessor::StartDeletionProcess()
 
 bool APossessor::UpdateArrowMiniGame(float deltaTime)
 {
+	ArrowMiniTimeElapsed += deltaTime;
+	if (!HasReachedTimeLimit(ArrowMiniTimeElapsed, ArrowMiniTimeLimit) && !bIsKeyProcessed)
+	{
+		if (ArrowSequenceIndex > -1 && ArrowSequenceIndex < ArrowSequence.Num() && CurrentArrow == ArrowSequence[ArrowSequenceIndex])
+		{
+
+			++ArrowSequenceIndex;
+		}
+		bIsKeyProcessed = true;
+	}
+	else
+	{
+		ArrowMiniTimeElapsed = 0.0f;
+		return true; // true == finished mini game
+	}
 	return false;
+}
+
+void APossessor::CalculateArrowSequence()
+{
+	ArrowSequence.Empty();
+	ArrowSequenceIndex = 0;
+	TArray<int8> rowsToExtract = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
+	for (int i = 0; i < rowsToExtract.Num(); ++i)
+	{
+		for (int j = 0; j < grid->GetWidth(); ++j)
+		{
+			FString arrow = grid->GetBlock(FVector2D(j, rowsToExtract[i]))->GetArrowDirection();
+			ArrowSequence.Add(arrow);
+		}
+	}
+}
+
+TArray<FString> APossessor::GetArrowSequence()
+{
+	return ArrowSequence;
 }

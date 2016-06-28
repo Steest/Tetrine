@@ -60,7 +60,7 @@ public:
 	bool bHasInitiatedHorizMove;
 	bool bIsFastFall;
 	bool bHasTetrominoLanded;
-	UPROPERTY(EditAnywhere, Category = "Game")
+	UPROPERTY(VisibleAnywhere, Category = "Game")
 	bool bHasMatchStarted;
 	bool bIsRotating;
 	bool bIsRotationKeyHeld;
@@ -68,9 +68,16 @@ public:
 	bool bIsInstantDropKeyHeld;
 	bool bHasChangedPositions;
 	bool bIsPlayingArrowMiniGame;
+	bool bIsKeyProcessed;
 
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
+	UPROPERTY(VisibleAnywhere, Category="Game")
+	TArray<FString> ArrowSequence;
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	FString CurrentArrow;
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	int32 ArrowSequenceIndex;
 
 	// methods
 	class ATetromino* SpawnTetromino();
@@ -94,4 +101,6 @@ public:
 	void InstantDrop();
 	void StartDeletionProcess();
 	bool UpdateArrowMiniGame(float deltaTime);
+	void CalculateArrowSequence();
+	TArray<FString> GetArrowSequence();
 };
