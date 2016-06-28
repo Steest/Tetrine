@@ -25,17 +25,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Anim")
 	class UPaperSprite* BlockSprite;
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
-		int8 BlockStatus; // 0=empty,1=taken(static),2=taken(moving)
+	int8 BlockStatus; // 0=empty,1=taken(static),2=taken(moving)
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
-		FVector2D Position; // position on the grid
+	FVector2D Position; // position on the grid
+	FString ArrowDirection;
 
-							// methods
+	// methods
 	bool DoesBlockCollide(FVector2D movement, class AGrid* grid);
 	bool SetBlockStatus(int8 blockType);
 	int8 GetBlockStatus();
 	void SetPosition(FVector2D position);
 	FVector2D GetPosition();
-	void SetBlockVisibility(bool b);
+	void SetArrowVisibility(int8 blockStatus);
 	FVector2D GetDimensions();
 	void SetBlockSprite(int8 blockStatus);
+	FString GetArrowDirection();
+	void SetArrowDirection(FString direction);
 };

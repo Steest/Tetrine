@@ -10,8 +10,6 @@ DEFINE_LOG_CATEGORY(Tetromino_log);
 ATetromino::ATetromino()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	rotationMatrix.Emplace(FVector2D(0, 1));
-	rotationMatrix.Emplace(FVector2D(-1, 0));
 }
 
 void ATetromino::BeginPlay() // we dont know which BeginPlay will fire first between this, possessor, tetromino, grid, blocks
@@ -22,6 +20,8 @@ void ATetromino::BeginPlay() // we dont know which BeginPlay will fire first bet
 		blocks.Add(SpawnBlock());
 		blocks[i]->SetBlockStatus(2);
 		blocks[i]->SetBlockSprite(2);
+		blocks[i]->SetArrowVisibility(2);
+		blocks[i]->SetArrowDirection(GenerateRandomArrowDirection());
 		// possessor places in the proper position
 	}
 }
@@ -134,17 +134,17 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 	}
 }
 
-void ATetromino::SetBlocksVisibility(bool b)
+void ATetromino::SetArrowsVisibility(int8 blockStatus)
 {
 	if (blocks.Num() < 4)
 	{
-		UE_LOG(Tetromino_log, Log, TEXT("SetBlocksVisibility Failed: blocks < 4"));
+		UE_LOG(Tetromino_log, Log, TEXT("SetArrowsVisibility Failed: blocks < 4"));
 		return;
 	}
-	blocks[0]->SetBlockVisibility(b);
-	blocks[1]->SetBlockVisibility(b);
-	blocks[2]->SetBlockVisibility(b);
-	blocks[3]->SetBlockVisibility(b);
+	blocks[0]->SetArrowVisibility(blockStatus);
+	blocks[1]->SetArrowVisibility(blockStatus);
+	blocks[2]->SetArrowVisibility(blockStatus);
+	blocks[3]->SetArrowVisibility(blockStatus);
 }
 
 void ATetromino::SetBlocksStatus(int8 blockStatus)
@@ -244,7 +244,7 @@ void ATetromino::ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid)
 		grid->GetBlock(oldPosition)->SetBlockSprite(0);
 	}
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i) // delete this and merge with up loop
 	{
 		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
@@ -255,7 +255,7 @@ void ATetromino::ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid)
 	}
 }
 
-TArray<FVector2D> ATetromino::CalculateRotation()
+TArray<FVector2D> ATetromino::CalculateRotation(const TArray<FVector2D> &rotationMatrix)
 {
 	TArray<FVector2D> RotatedPositions;
 	for (int i = 0; i < 4; ++i)
@@ -283,4 +283,13 @@ TArray<FVector2D> ATetromino::GetPositions()
 		resultingPositions.Add(blocks[i]->GetPosition());
 	}
 	return resultingPositions;
+}
+
+FString ATetromino::GenerateRandomArrowDirection()
+{
+	float randy = FMath::RandRange(0.0f, 1.0f); // break up into evenly random block probabilities
+	if (randy <= .250f) { return "up"; }
+	else if (randy <= .250f * 2.0f) { return "right"; }
+	else if (randy <= .250f * 3.0f) { return "down"; }
+	else { return "left"; }
 }

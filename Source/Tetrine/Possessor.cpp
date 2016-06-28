@@ -45,6 +45,9 @@ APossessor::APossessor()
 	HorizontalTimeLimit = 0.3f;
 	FastHorizTimeLimit = 0.05f;
 	LandedTimeLimit = 0.5f;
+
+	RotationMatrix.Emplace(FVector2D(0, 1));
+	RotationMatrix.Emplace(FVector2D(-1, 0));
 }
 
 // Called when the game starts or when spawned
@@ -127,12 +130,12 @@ ATetromino* APossessor::SpawnTetromino()
 FString APossessor::GenerateRandomTetromino()
 { // we know there are 7 different types of blocks
 	float randy = FMath::RandRange(0.0f, 1.0f); // break up into evenly random block probabilities
-	if (randy < .143) { return "square"; }
-	else if (randy < .143 * 2) { return "right bicep"; }
-	else if (randy < .143 * 3) { return "left bicep"; }
-	else if (randy < .143 * 4) { return "flat"; }
-	else if (randy < .143 * 5) { return "s"; }
-	else if (randy < .143 * 6) { return  "z"; }
+	if (randy <= .143f) { return "square"; }
+	else if (randy <= .143f * 2.0f) { return "right bicep"; }
+	else if (randy <= .143f * 3.0f) { return "left bicep"; }
+	else if (randy <= .143f * 4.0f) { return "flat"; }
+	else if (randy <= .143f * 5.0f) { return "s"; }
+	else if (randy <= .143f * 6.0f) { return  "z"; }
 	else { return "t"; }
 }
 
@@ -314,7 +317,7 @@ void APossessor::DeleteRows(TArray<int8> deletionRows)
 
 void APossessor::UpdateRotations()
 {
-	TArray<FVector2D> newPositions = CurrentTetromino->CalculateRotation();
+	TArray<FVector2D> newPositions = CurrentTetromino->CalculateRotation(RotationMatrix);
 	CurrentTetromino->ShiftPositions(newPositions, grid);
 	if (CurrentTetromino->CanShiftPositions(newPositions, grid))
 	{

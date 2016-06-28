@@ -5,7 +5,6 @@
 #include "Grid.h"
 #include "PaperSpriteComponent.h"
 
-// Sets default values
 ABlock::ABlock()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -26,10 +25,12 @@ ABlock::ABlock()
 	ArrowSprite->SetSprite(ArrowSpriteAsset.Object);
 	ArrowSprite->AttachTo(BlockHitBox);
 	ArrowSprite->SetVisibility(false);
+	ArrowSprite->AddWorldOffset(FVector(0.0f, 2.0f, 0.0f));
 
 	BlockStatus = 0;
 	Position.X = 0;
 	Position.Y = 0;
+	ArrowDirection = "none";
 }
 
 void ABlock::BeginPlay()
@@ -74,9 +75,9 @@ int8 ABlock::GetBlockStatus()
 	return BlockStatus;
 }
 
-void ABlock::SetBlockVisibility(bool b)
+void ABlock::SetArrowVisibility(int8 blockStatus)
 {
-	BlockHitBox->SetVisibility(b);
+	bool b = (blockStatus == 1 || blockStatus == 2) ? true : false;
 	ArrowSprite->SetVisibility(b);
 }
 
@@ -95,3 +96,19 @@ void ABlock::SetBlockSprite(int8 blockStatus)
 	if (blockStatus == 0) { BlockHitBox->SetSprite(EmptySprite); }
 	else if (blockStatus == 1 || blockStatus == 2) { BlockHitBox->SetSprite(BlockSprite); }
 }
+
+FString ABlock::GetArrowDirection()
+{
+	return ArrowDirection;
+}
+
+void ABlock::SetArrowDirection(FString direction)
+{
+	if (direction == "up") { ArrowSprite->SetWorldRotation(FRotator(90.0f,0.0f,0.0f)); }
+	else if (direction == "right") { ArrowSprite->SetWorldRotation(FRotator(0.0f,0.0f,0.0f)); }
+	else if (direction == "down") { ArrowSprite->SetWorldRotation(FRotator(270.0f,0.0f,0.0f)); }
+	else if (direction == "left") { ArrowSprite->SetWorldRotation(FRotator(180.0f,0.0f,0.0f)); }
+	else { return; }
+	ArrowDirection = direction;
+}
+

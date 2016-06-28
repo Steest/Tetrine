@@ -64,6 +64,7 @@ public:
 	bool bIsInstantDropKeyHeld;
 	bool bHasChangedPositions;
 	TArray<FVector2D> OldGhostPositions;
+	TArray<FVector2D> RotationMatrix;
 
 	// methods
 	class ATetromino* SpawnTetromino();

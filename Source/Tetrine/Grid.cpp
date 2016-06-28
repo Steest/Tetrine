@@ -12,7 +12,7 @@ AGrid::AGrid()
 	PrimaryActorTick.bCanEverTick = false;
 
 	width = 10;
-	height = 21;
+	height = 22;
 
 	GridComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("GridComponent"));
 	RootComponent = GridComponent;
@@ -47,17 +47,6 @@ void AGrid::GenerateMatrix(int scale)
 		}
 		matrix.Add(tempRow);
 	}
-
-	//temp
-	/*
-	matrix[0][7]->SetBlockVisibility(1);
-	matrix[0][7]->SetBlockSprite(1);
-	matrix[0][7]->SetBlockStatus(1);
-
-	matrix[5][0]->SetBlockVisibility(1);
-	matrix[5][0]->SetBlockSprite(1);
-	matrix[5][0]->SetBlockStatus(1);
-	*/
 }
 
 bool AGrid::DropBlock(ABlock* block)
@@ -74,7 +63,7 @@ bool AGrid::DropBlock(ABlock* block)
 
 int32 AGrid::GetHeight()
 {
-	return height-1;
+	return height-2;
 }
 
 int32 AGrid::GetWidth()
@@ -103,6 +92,7 @@ void AGrid::DeleteRow(int8 row)
 	{
 		matrix[i][row]->SetBlockSprite(0);
 		matrix[i][row]->SetBlockStatus(0);
+		matrix[i][row]->SetArrowVisibility(0);
 	}
 }
 
@@ -143,11 +133,13 @@ bool AGrid::IsRowEmpty(int8 row)
 	return true;
 }
 
-void AGrid::TransferRow(int8 FromRow, int8 ToRow)
+void AGrid::TransferRow(int8 fromRow, int8 toRow)
 {
 	for (int i = 0; i < GetWidth(); ++i)
 	{
-		matrix[i][ToRow]->SetBlockStatus(matrix[i][FromRow]->GetBlockStatus());
-		matrix[i][ToRow]->SetBlockSprite(matrix[i][FromRow]->GetBlockStatus());
+		matrix[i][toRow]->SetBlockStatus(matrix[i][fromRow]->GetBlockStatus());
+		matrix[i][toRow]->SetBlockSprite(matrix[i][fromRow]->GetBlockStatus());
+		matrix[i][toRow]->SetArrowDirection(matrix[i][fromRow]->GetArrowDirection());
+		matrix[i][toRow]->SetArrowVisibility(matrix[i][fromRow]->GetBlockStatus());
 	}
 }
