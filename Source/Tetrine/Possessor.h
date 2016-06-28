@@ -50,6 +50,10 @@ public:
 	float LandedTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LandedTimeElapsed;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float ArrowMiniTimeLimit;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float ArrowMiniTimeElapsed;
 	float PreviousHorizontalMove;
 	float CurrentHorizontalMove;
 	bool bIsFastHorizontal;
@@ -63,6 +67,8 @@ public:
 	bool bIsInstantDropped;
 	bool bIsInstantDropKeyHeld;
 	bool bHasChangedPositions;
+	bool bIsPlayingArrowMiniGame;
+
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
 
@@ -73,7 +79,7 @@ public:
 	bool HasReachedTimeLimit(float &elapsed, float &timeLimit);
 	void UpdateFallElapsed(float deltaTime);
 	void UpdateHorizontalElapsed(float deltaTime);
-	void UpdateLandedElapsed(float deltaTime);
+	bool UpdateLandedElapsed(float deltaTime);
 	void MoveHorizontal(float axisValue);
 	void MoveDown(float axisValue);
 	FVector2D GetHorizontalMovement();
@@ -86,4 +92,6 @@ public:
 	void InstantDropPressed();
 	void InstantDropReleased();
 	void InstantDrop();
+	void StartDeletionProcess();
+	bool UpdateArrowMiniGame(float deltaTime);
 };

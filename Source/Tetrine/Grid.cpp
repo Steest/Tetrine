@@ -79,6 +79,7 @@ ABlock* AGrid::GetBlock(FVector2D position)
 void AGrid::SetBlock(ABlock* newBlock)
 {
 	matrix[newBlock->GetPosition().X][newBlock->GetPosition().Y] = newBlock;
+	GetBlock(newBlock->GetPosition())->SetActorLocation(FVector(GetBlock(newBlock->GetPosition())->GetActorLocation().X, -1.0f, GetBlock(newBlock->GetPosition())->GetActorLocation().Z)); // fixes the ghost overlapping live tetromino
 }
 
 ABlock* AGrid::SpawnBlock()

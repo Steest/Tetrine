@@ -28,6 +28,7 @@ APossessor::APossessor()
 	LandedTimeElapsed = 0.0f;
 	PreviousHorizontalMove = 0.0f;
 	CurrentHorizontalMove = 0.0f;
+	ArrowMiniTimeElapsed = 0.0f;
 
 	bool bIsFastHorizontal = false;
 	bool bHasInitiatedHorizMove = false;
@@ -37,6 +38,7 @@ APossessor::APossessor()
 	bool bIsRotating = false;
 	bool bIsRotationKeyHeld = false;
 	bool bHasChangedPositions = true;
+	bool bIsPlayingArrowMiniGame = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -45,7 +47,7 @@ APossessor::APossessor()
 	HorizontalTimeLimit = 0.3f;
 	FastHorizTimeLimit = 0.05f;
 	LandedTimeLimit = 0.5f;
-
+	ArrowMiniTimeLimit = 2.0f;
 	RotationMatrix.Emplace(FVector2D(0, 1));
 	RotationMatrix.Emplace(FVector2D(-1, 0));
 }
@@ -78,12 +80,19 @@ void APossessor::Tick(float DeltaTime)
 			bHasChangedPositions = true;
 		}
 
-		if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true;}
-		UpdateFallElapsed(DeltaTime);
-		if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
-		if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
-		if (bHasChangedPositions) { UpdateGhostTetromino(); }
-		if (bHasTetrominoLanded) { UpdateLandedElapsed(DeltaTime); }
+		if (!bIsPlayingArrowMiniGame)
+		{
+			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
+			UpdateFallElapsed(DeltaTime);
+			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
+			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
+			if (bHasChangedPositions) { UpdateGhostTetromino(); }
+			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bIsPlayingArrowMiniGame = true; } 
+		}
+		else 
+		{ 
+			if (!UpdateArrowMiniGame(DeltaTime)) { StartDeletionProcess(); bIsPlayingArrowMiniGame = false; }
+		}
 	}
 	else
 	{
@@ -229,23 +238,21 @@ void APossessor::UpdateHorizontalElapsed(float deltaTime)
 	}
 }
 
-void APossessor::UpdateLandedElapsed(float deltaTime)
+bool APossessor::UpdateLandedElapsed(float deltaTime)
 {
 	LandedTimeElapsed += deltaTime;
+	bool bIsFinished = false;
 	if (HasReachedTimeLimit(LandedTimeElapsed, LandedTimeLimit))
 	{
 		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true) // block must be below in order to drop block
 		{
-			TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
-			CurrentTetromino->EndLife(grid);
-			DeleteRows(RowsToDelete);
-			grid->DropRows();
-			CurrentTetromino = nullptr;
+			bIsFinished = true;
 		}
 		LandedTimeElapsed = 0.0f;
 		bHasTetrominoLanded = false;
 		FallTimeElapsed = 0.0f;
 	}
+	return bIsFinished;
 }
 
 void APossessor::MoveHorizontal(float axisValue)
@@ -369,4 +376,18 @@ void APossessor::InstantDrop()
 		CurrentTetromino->blocks[i]->SetPosition(OldGhostPositions[i]);
 		CurrentTetromino->blocks[i]->SetActorLocation(CurrentTetromino->blocks[i]->GetDimensions().X * FVector(OldGhostPositions[i].X, 0, OldGhostPositions[i].Y));
 	}
+}
+
+void APossessor::StartDeletionProcess()
+{
+	TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
+	CurrentTetromino->EndLife(grid);
+	DeleteRows(RowsToDelete);
+	grid->DropRows();
+	CurrentTetromino = nullptr;
+}
+
+bool APossessor::UpdateArrowMiniGame(float deltaTime)
+{
+	return false;
 }

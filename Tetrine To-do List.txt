@@ -1,6 +1,6 @@
 To-do List
 -------------------------------------------------------------
-
+- Add Color to different tetromino shapes
 - Add Row Arrows Minigame
 - User interface
 - sounds
