@@ -1,0 +1,10 @@
+To-do List
+-------------------------------------------------------------
+
+- Add Row Arrows Minigame
+- User interface
+- sounds
+- music
+- scoring system
+- menu 
+- win/lose conditions
