@@ -13,9 +13,9 @@ class TETRINE_API APossessor : public APawn
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-	TSubclassOf<class UUserWidget> wSideBarDisplay;
-	UUserWidget* MySideBarDisplay;*/
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	//TSubclassOf<class UUserWidget> wSideBarDisplay;
+	//UUserWidget* MySideBarDisplay;
 
 	APossessor();
 	virtual void BeginPlay() override;
