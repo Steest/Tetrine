@@ -14,10 +14,10 @@ class TETRINE_API APossessor : public APawn
 public:
 
 	//UMG Widget Contents
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		TSubclassOf<class UUserWidget> wSideBarDisplay;
 
-	UUserWidget* MySideBarDisplay;
+	UUserWidget* MySideBarDisplay;*/
 
 	APossessor();
 	virtual void BeginPlay() override;
