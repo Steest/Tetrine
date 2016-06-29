@@ -26,6 +26,8 @@ public:
 	UCameraComponent* MainCamera;
 	UPROPERTY(EditAnywhere, Category = "Anim")
 	class UPaperSprite* GhostSprite;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	class UPaperSprite* HighlightArrowSprite;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
@@ -56,9 +58,12 @@ public:
 	float ArrowMiniTimeElapsed;
 	float PreviousHorizontalMove;
 	float CurrentHorizontalMove;
+	float PreviousVerticalMove;
+	float CurrentVerticalMove;
 	bool bIsFastHorizontal;
 	bool bHasInitiatedHorizMove;
 	bool bIsFastFall;
+	UPROPERTY(VisibleAnywhere,Category="Game")
 	bool bHasTetrominoLanded;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	bool bHasMatchStarted;
@@ -67,7 +72,7 @@ public:
 	bool bIsInstantDropped;
 	bool bIsInstantDropKeyHeld;
 	bool bHasChangedPositions;
-	bool bIsPlayingArrowMiniGame;
+	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
 
 	TArray<FVector2D> OldGhostPositions;
@@ -77,7 +82,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	FString CurrentArrow;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
-	int32 ArrowSequenceIndex;
+	FVector2D ArrowSequencePosition;
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	int8 ExtraRowsToDelete;
 
 	// methods
 	class ATetromino* SpawnTetromino();
@@ -87,11 +94,9 @@ public:
 	void UpdateFallElapsed(float deltaTime);
 	void UpdateHorizontalElapsed(float deltaTime);
 	bool UpdateLandedElapsed(float deltaTime);
-	void MoveHorizontal(float axisValue);
-	void MoveDown(float axisValue);
+	void MoveHorizontally(float axisValue);
+	void MoveVertically(float axisValue);
 	FVector2D GetHorizontalMovement();
-	void RotateKeyPressed();
-	void RotateKeyReleased();
 	TArray<int8> FilterForDeletion(TArray<int8> potentialRows);
 	void DeleteRows(TArray<int8> deletionRows);
 	void UpdateRotations();
@@ -99,7 +104,7 @@ public:
 	void InstantDropPressed();
 	void InstantDropReleased();
 	void InstantDrop();
-	void StartDeletionProcess();
+	void StartDeletionProcess(int8 extraRowsToDelete);
 	bool UpdateArrowMiniGame(float deltaTime);
 	void CalculateArrowSequence();
 	TArray<FString> GetArrowSequence();

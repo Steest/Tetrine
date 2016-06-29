@@ -144,3 +144,28 @@ void AGrid::TransferRow(int8 fromRow, int8 toRow)
 		matrix[i][toRow]->SetArrowVisibility(matrix[i][fromRow]->GetBlockStatus());
 	}
 }
+
+TArray<int8> AGrid::GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows)
+{
+	TArray<int8> extraRows = rowsToAvoid;
+	for (int i = 0; i < GetHeight() && numOfRows > 0; ++i)
+	{
+		if (!rowsToAvoid.Contains(i)) {	extraRows.Add(i); --numOfRows; }
+	}
+	extraRows.Sort();
+
+	for (int i = 0; i < extraRows.Num(); ++i)
+	{
+		UE_LOG(Grid_log, Log, TEXT("EXTRA ROWS: i : %d"), extraRows[i]);
+	}
+	return extraRows;
+}
+
+void AGrid::SetBlockSprite(UPaperSprite* sprite, FVector2D position)
+{
+	GetBlock(position)->ArrowSprite->SetSprite(sprite);
+	if (position.X - 1 >= 0)
+	{
+		//GetBlock(FVector2D(position.X - 1, position.Y))->SetBlockSprite(GetBlock(FVector2D(position.X - 1, position.Y))->GetBlockStatus());
+	}
+}
