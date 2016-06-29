@@ -37,5 +37,6 @@ public:
 	bool IsRowEmpty(int8 row);
 	void TransferRow(int8 fromRow, int8 toRow);
 	TArray<int8> GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows);
-	void SetBlockSprite(class UPaperSprite* sprite, FVector2D position);
+	void SetArrowSprite(class UPaperSprite* sprite, FVector2D position);
+	void SetRowArrowSprite(class UPaperSprite* sprite, int8 row);
 };

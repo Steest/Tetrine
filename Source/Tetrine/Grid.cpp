@@ -156,11 +156,15 @@ TArray<int8> AGrid::GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows
 	return extraRows;
 }
 
-void AGrid::SetBlockSprite(UPaperSprite* sprite, FVector2D position)
+void AGrid::SetArrowSprite(UPaperSprite* sprite, FVector2D position)
 {
 	GetBlock(position)->ArrowSprite->SetSprite(sprite);
-	if (position.X - 1 >= 0)
+}
+
+void AGrid::SetRowArrowSprite(class UPaperSprite* sprite, int8 row)
+{
+	for (int i = 0; i < GetWidth(); ++i)
 	{
-		//GetBlock(FVector2D(position.X - 1, position.Y))->SetBlockSprite(GetBlock(FVector2D(position.X - 1, position.Y))->GetBlockStatus());
+		SetArrowSprite(sprite, FVector2D(i, row));
 	}
 }

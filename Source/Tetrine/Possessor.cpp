@@ -18,10 +18,20 @@ APossessor::APossessor()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	RootComponent = MainCamera;
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> GhostSpriteAsset(TEXT("PaperSprite'/Game/Art/ghost_block_Sprite.ghost_block_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
-
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/Highlight2Arrow_Sprite.Highlight2Arrow_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightRowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ArrowSpriteAsset(TEXT("PaperSprite'/Game/Art/Arrow_Sprite.Arrow_Sprite'"));
+	ConstructorHelpers::FObjectFinder<UPaperSprite> ArrowTimerBarAsset(TEXT("PaperSprite'/Game/Art/ArrowTimerBar_Sprite.ArrowTimerBar_Sprite'"));
+	
 	GhostSprite = GhostSpriteAsset.Get();
 	HighlightArrowSprite = HighlightArrowAsset.Get();
+	HighlightRowSprite = HighlightRowAsset.Get();
+	ArrowSprite = ArrowSpriteAsset.Get();
+	
+	ArrowTimerBar = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowTimerBar"));
+	ArrowTimerBar->SetSprite(ArrowTimerBarAsset.Object);
+	ArrowTimerBar->SetWorldScale3D(FVector(10.0f, 1.0f, 1.0f));
+	ArrowTimerBar->SetVisibility(false);
 
 	NextTetromino = "none";
 	FallTimeElapsed = 0.0f;
@@ -88,7 +98,7 @@ void APossessor::Tick(float DeltaTime)
 			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
 			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
 			if (bHasChangedPositions) { UpdateGhostTetromino(); }
-			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = true; CalculateArrowSequence(); bIsKeyProcessed = true; ExtraRowsToDelete = 0; }
+			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = true; CalculateArrowSequence(); bIsKeyProcessed = true; }
 		}
 		else 
 		{ 
@@ -98,6 +108,9 @@ void APossessor::Tick(float DeltaTime)
 				bHasRowsToDelete = bHasTetrominoLanded = false; 
 				CurrentArrow = "none"; 
 				ArrowMiniTimeElapsed = 0.0f;
+				ExtraRowsToDelete = 0;
+				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
+				ArrowTimerBar->SetVisibility(false);
 			}
 		}
 	}
@@ -411,7 +424,9 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 	ArrowMiniTimeElapsed += deltaTime;
 	if (!HasReachedTimeLimit(ArrowMiniTimeElapsed, ArrowMiniTimeLimit))
 	{
-		grid->SetBlockSprite(HighlightArrowSprite, ArrowSequencePosition);
+		UpdateArrowMiniTimerBar();
+		grid->SetRowArrowSprite(HighlightRowSprite, ArrowSequencePosition.Y);
+		grid->SetArrowSprite(HighlightArrowSprite, ArrowSequencePosition);
 		if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow == ArrowSequence[ArrowSequencePosition.X])
 		{
 			UE_LOG(Possessor_log, Error, TEXT("ARROW MATCHED...%s == %s"), *CurrentArrow, *(ArrowSequence[ArrowSequencePosition.X]));
@@ -419,7 +434,7 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 			CurrentArrow = "none";
 			if (ArrowSequencePosition.X == ArrowSequence.Num())
 			{
-				ExtraRowsToDelete = 10;
+				ExtraRowsToDelete = 2;
 				return false;
 			}
 		}
@@ -435,7 +450,7 @@ void APossessor::CalculateArrowSequence()
 	ArrowSequence.Empty();
 	ArrowSequencePosition.X = 0;
 	TArray<int8> rowsToExtract = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
-	MapTetrominoPositions(); // grid has "none" as arrow direction for some parts, need to map tetro to grid
+	MapTetrominoArrows(); // grid has "none" as arrow direction for some parts, need to map tetro to grid
 	for (int i = 0; i < rowsToExtract.Num(); ++i)
 	{
 		for (int j = 0; j < grid->GetWidth(); ++j)
@@ -444,6 +459,7 @@ void APossessor::CalculateArrowSequence()
 			ArrowSequence.Add(arrow);
 		}
 		ArrowSequencePosition.Y = rowsToExtract[i];
+		ArrowTimerBar->SetVisibility(true);
 		break; // only need one row
 	}
 }
@@ -453,7 +469,7 @@ TArray<FString> APossessor::GetArrowSequence()
 	return ArrowSequence;
 }
 
-void APossessor::MapTetrominoPositions()
+void APossessor::MapTetrominoArrows()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -463,4 +479,16 @@ void APossessor::MapTetrominoPositions()
 		UE_LOG(Possessor_log, Warning, TEXT("Mapped %s to %s"), *tempPos.ToString(), *(CurrentTetromino->blocks[i]->GetArrowDirection()));
 		CurrentTetromino->blocks[i]->AddActorLocalOffset(FVector(0.0f, -2.0f, 0.0f));
 	}
+}
+
+//
+// needs to be finished
+//
+// waiting for individual colors of the blocks to happen first
+//
+void APossessor::UpdateArrowMiniTimerBar()
+{
+	float theMath = 1.0f - 10.0f*(ArrowMiniTimeElapsed / ArrowMiniTimeLimit);
+	ArrowTimerBar->SetWorldLocation(FVector(ArrowTimerBar->GetSprite()->GetSourceSize().X*10, 1, ArrowSequencePosition.Y));
+	//ArrowTimerBar->SetWorldScale3D(FVector(-theMath, 1.0f, 1.0f));
 }

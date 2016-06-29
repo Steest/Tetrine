@@ -1,7 +1,9 @@
 To-do List
 -------------------------------------------------------------
+
 - Add Color to different tetromino shapes
 - Add Row Arrows Minigame
+  - Add timer graphic that indicates time left for minigame
 - User interface
 - sounds
 - music
