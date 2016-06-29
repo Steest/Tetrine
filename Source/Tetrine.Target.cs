@@ -20,6 +20,6 @@ public class TetrineTarget : TargetRules
 		ref List<string> OutExtraModuleNames
 		)
 	{
-		OutExtraModuleNames.AddRange( new string[] { "Tetrine" } );
+		OutExtraModuleNames.AddRange( new string[] { "Tetrine", "UMG", "Slate", "SlateCore" } );
 	}
 }
