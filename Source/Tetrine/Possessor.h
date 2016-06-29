@@ -108,4 +108,5 @@ public:
 	bool UpdateArrowMiniGame(float deltaTime);
 	void CalculateArrowSequence();
 	TArray<FString> GetArrowSequence();
+	void MapTetrominoPositions();
 };

@@ -111,4 +111,3 @@ void ABlock::SetArrowDirection(FString direction)
 	else { return; }
 	ArrowDirection = direction;
 }
-

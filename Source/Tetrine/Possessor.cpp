@@ -71,7 +71,7 @@ void APossessor::Tick(float DeltaTime)
 
 	if (bHasMatchStarted)
 	{
-		if (grid == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Grid1 == nullptr")); return; }
+		if (grid == nullptr) { UE_LOG(Possessor_log, Error, TEXT("Grid1 == nullptr")); return; }
 		if (CurrentTetromino == nullptr)
 		{
 			CurrentTetromino = SpawnTetromino();
@@ -92,17 +92,23 @@ void APossessor::Tick(float DeltaTime)
 		}
 		else 
 		{ 
-			if (!UpdateArrowMiniGame(DeltaTime)) { StartDeletionProcess(ExtraRowsToDelete); bHasRowsToDelete = bHasTetrominoLanded = false; CurrentArrow = "none"; }
+			if (!UpdateArrowMiniGame(DeltaTime)) 
+			{
+				StartDeletionProcess(ExtraRowsToDelete); 
+				bHasRowsToDelete = bHasTetrominoLanded = false; 
+				CurrentArrow = "none"; 
+				ArrowMiniTimeElapsed = 0.0f;
+			}
 		}
 	}
 	else
 	{
-		if (GetWorld() == nullptr) { UE_LOG(Possessor_log, Log, TEXT("GetWorld1 == nullptr")); return; }
+		if (GetWorld() == nullptr) { UE_LOG(Possessor_log, Error, TEXT("GetWorld1 == nullptr")); return; }
 		//grid = SpawnGrid();
-		if (grid == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Grid2 == nullptr")); return; }
+		if (grid == nullptr) { UE_LOG(Possessor_log, Error, TEXT("Grid2 == nullptr")); return; }
 
 		CurrentTetromino = SpawnTetromino();
-		if (CurrentTetromino == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Tetro2 == nullptr")); return; }
+		if (CurrentTetromino == nullptr) { UE_LOG(Possessor_log, Error, TEXT("Tetro2 == nullptr")); return; }
 		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 		OldGhostPositions = CurrentTetromino->GetPositions();
@@ -273,8 +279,9 @@ void APossessor::MoveHorizontally(float axisValue)
 		FastHorizTimeElapsed = 0.0f;
 		HorizontalTimeElapsed = 0.0f;
 
-		if (CurrentHorizontalMove > 0 && bIsKeyProcessed ) { CurrentArrow = "right"; bIsKeyProcessed = false; }
-		else if (CurrentHorizontalMove < 0 && bIsKeyProcessed ) { CurrentArrow = "left"; bIsKeyProcessed = false; }
+		if (CurrentHorizontalMove > 0.0f && bIsKeyProcessed ) { CurrentArrow = "right"; bIsKeyProcessed = false; }
+		else if (CurrentHorizontalMove < 0.0f && bIsKeyProcessed ) { CurrentArrow = "left"; bIsKeyProcessed = false; }
+		else if (CurrentVerticalMove == 0.0f) { CurrentArrow = "none"; bIsKeyProcessed = true; }
 	}
 }
 
@@ -284,7 +291,7 @@ void APossessor::MoveVertically(float axisValue)
 	CurrentVerticalMove = axisValue;
 	if (CurrentVerticalMove == 0.0f) 
 	{ 
-		if (CurrentHorizontalMove == 0) { CurrentArrow = "none"; bIsKeyProcessed = true; }
+		if (CurrentHorizontalMove == 0.0f) { CurrentArrow = "none"; bIsKeyProcessed = true; }
 		bIsFastFall = bIsRotationKeyHeld = false;
 		FastFallTimeElapsed = 0.0f;
 	}
@@ -407,6 +414,7 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 		grid->SetBlockSprite(HighlightArrowSprite, ArrowSequencePosition);
 		if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow == ArrowSequence[ArrowSequencePosition.X])
 		{
+			UE_LOG(Possessor_log, Error, TEXT("ARROW MATCHED...%s == %s"), *CurrentArrow, *(ArrowSequence[ArrowSequencePosition.X]));
 			++ArrowSequencePosition.X;
 			CurrentArrow = "none";
 			if (ArrowSequencePosition.X == ArrowSequence.Num())
@@ -427,6 +435,7 @@ void APossessor::CalculateArrowSequence()
 	ArrowSequence.Empty();
 	ArrowSequencePosition.X = 0;
 	TArray<int8> rowsToExtract = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
+	MapTetrominoPositions(); // grid has "none" as arrow direction for some parts, need to map tetro to grid
 	for (int i = 0; i < rowsToExtract.Num(); ++i)
 	{
 		for (int j = 0; j < grid->GetWidth(); ++j)
@@ -442,4 +451,16 @@ void APossessor::CalculateArrowSequence()
 TArray<FString> APossessor::GetArrowSequence()
 {
 	return ArrowSequence;
+}
+
+void APossessor::MapTetrominoPositions()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		FVector2D tempPos = CurrentTetromino->blocks[i]->GetPosition();
+		grid->GetBlock(tempPos)->SetArrowDirection(CurrentTetromino->blocks[i]->GetArrowDirection());
+		grid->GetBlock(tempPos)->SetArrowVisibility(1);
+		UE_LOG(Possessor_log, Warning, TEXT("Mapped %s to %s"), *tempPos.ToString(), *(CurrentTetromino->blocks[i]->GetArrowDirection()));
+		CurrentTetromino->blocks[i]->AddActorLocalOffset(FVector(0.0f, -2.0f, 0.0f));
+	}
 }
