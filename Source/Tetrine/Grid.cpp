@@ -53,7 +53,7 @@ bool AGrid::DropBlock(ABlock* block)
 {
 	if (block == nullptr)
 	{
-		UE_LOG(Grid_log, Log, TEXT("DropBlock Failed: block == nullptr"));
+		UE_LOG(Grid_log, Error, TEXT("DropBlock Failed: block == nullptr"));
 		return false;
 	}
 	GetBlock(block->GetPosition())->Destroy();
@@ -153,11 +153,6 @@ TArray<int8> AGrid::GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows
 		if (!rowsToAvoid.Contains(i)) {	extraRows.Add(i); --numOfRows; }
 	}
 	extraRows.Sort();
-
-	for (int i = 0; i < extraRows.Num(); ++i)
-	{
-		UE_LOG(Grid_log, Log, TEXT("EXTRA ROWS: i : %d"), extraRows[i]);
-	}
 	return extraRows;
 }
 

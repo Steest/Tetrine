@@ -13,11 +13,9 @@ class TETRINE_API APossessor : public APawn
 
 public:
 
-	//UMG Widget Contents
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-		TSubclassOf<class UUserWidget> wSideBarDisplay;
-
-	UUserWidget* MySideBarDisplay;*/
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	//TSubclassOf<class UUserWidget> wSideBarDisplay;
+	//UUserWidget* MySideBarDisplay;
 
 	APossessor();
 	virtual void BeginPlay() override;
@@ -115,4 +113,5 @@ public:
 	bool UpdateArrowMiniGame(float deltaTime);
 	void CalculateArrowSequence();
 	TArray<FString> GetArrowSequence();
+	void MapTetrominoPositions();
 };

@@ -28,6 +28,7 @@ public:
 	int8 BlockStatus; // 0=empty,1=taken(static),2=taken(moving)
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	FVector2D Position; // position on the grid
+	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	FString ArrowDirection;
 
 	// methods

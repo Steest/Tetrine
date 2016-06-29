@@ -100,7 +100,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else
 	{
-		UE_LOG(Tetromino_log, Log, TEXT("SpawnShape: String didn't match any existing shapes"));
+		UE_LOG(Tetromino_log, Error, TEXT("SpawnShape: String didn't match any existing shapes"));
 	}
 }
 
@@ -138,7 +138,7 @@ void ATetromino::SetArrowsVisibility(int8 blockStatus)
 {
 	if (blocks.Num() < 4)
 	{
-		UE_LOG(Tetromino_log, Log, TEXT("SetArrowsVisibility Failed: blocks < 4"));
+		UE_LOG(Tetromino_log, Error, TEXT("SetArrowsVisibility Failed: blocks < 4"));
 		return;
 	}
 	blocks[0]->SetArrowVisibility(blockStatus);
@@ -151,7 +151,7 @@ void ATetromino::SetBlocksStatus(int8 blockStatus)
 {
 	if (blocks.Num() < 4)
 	{
-		UE_LOG(Tetromino_log, Log, TEXT("SetBlocksStatus Failed: blocks < 4"));
+		UE_LOG(Tetromino_log, Error, TEXT("SetBlocksStatus Failed: blocks < 4"));
 		return;
 	}
 	blocks[0]->SetBlockStatus(blockStatus);
