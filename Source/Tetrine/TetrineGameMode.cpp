@@ -2,7 +2,11 @@
 
 #include "Tetrine.h"
 #include "TetrineGameMode.h"
+//#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 
-
+void ATetrineGameMode::StartPlay()
+{
+	//HUDClass = ASideBarDisplay::StaticClass();
+}
 
 

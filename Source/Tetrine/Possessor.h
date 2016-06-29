@@ -12,6 +12,11 @@ class TETRINE_API APossessor : public APawn
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wSideBarDisplay;
+	UUserWidget* MySideBarDisplay;*/
+
 	APossessor();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
