@@ -18,7 +18,10 @@ APossessor::APossessor()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	RootComponent = MainCamera;
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> GhostSpriteAsset(TEXT("PaperSprite'/Game/Art/ghost_block_Sprite.ghost_block_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
+
 	GhostSprite = GhostSpriteAsset.Get();
+	HighlightArrowSprite = HighlightArrowAsset.Get();
 
 	NextTetromino = "none";
 	FallTimeElapsed = 0.0f;
@@ -69,7 +72,6 @@ void APossessor::Tick(float DeltaTime)
 	if (bHasMatchStarted)
 	{
 		if (grid == nullptr) { UE_LOG(Possessor_log, Log, TEXT("Grid1 == nullptr")); return; }
-
 		if (CurrentTetromino == nullptr)
 		{
 			CurrentTetromino = SpawnTetromino();
@@ -79,19 +81,18 @@ void APossessor::Tick(float DeltaTime)
 			bHasTetrominoLanded = false;
 			bHasChangedPositions = true;
 		}
-
-		if (!bIsPlayingArrowMiniGame)
+		if (!bHasRowsToDelete)
 		{
 			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
 			UpdateFallElapsed(DeltaTime);
 			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
 			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
 			if (bHasChangedPositions) { UpdateGhostTetromino(); }
-			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bIsPlayingArrowMiniGame = true; CalculateArrowSequence(); bIsKeyProcessed = true; } // new arrow needed for mini game
+			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = true; CalculateArrowSequence(); bIsKeyProcessed = true; ExtraRowsToDelete = 0; }
 		}
 		else 
 		{ 
-			if (!UpdateArrowMiniGame(DeltaTime)) { StartDeletionProcess(); bIsPlayingArrowMiniGame = false; }
+			if (!UpdateArrowMiniGame(DeltaTime)) { StartDeletionProcess(ExtraRowsToDelete); bHasRowsToDelete = bHasTetrominoLanded = false; CurrentArrow = "none"; }
 		}
 	}
 	else
@@ -116,11 +117,8 @@ void APossessor::SetupPlayerInputComponent(class UInputComponent* InputComponent
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
-	InputComponent->BindAxis("MoveHorizontal", this, &APossessor::MoveHorizontal);
-	InputComponent->BindAxis("MoveDown", this, &APossessor::MoveDown);
-
-	InputComponent->BindAction("Rotate", EInputEvent::IE_Pressed, this, &APossessor::RotateKeyPressed);
-	InputComponent->BindAction("Rotate", EInputEvent::IE_Released, this, &APossessor::RotateKeyReleased);
+	InputComponent->BindAxis("MoveHorizontally", this, &APossessor::MoveHorizontally);
+	InputComponent->BindAxis("MoveVertically", this, &APossessor::MoveVertically);
 
 	InputComponent->BindAction("InstantDrop", EInputEvent::IE_Pressed, this, &APossessor::InstantDropPressed);
 	InputComponent->BindAction("InstantDrop", EInputEvent::IE_Released, this, &APossessor::InstantDropReleased);
@@ -241,27 +239,34 @@ void APossessor::UpdateHorizontalElapsed(float deltaTime)
 bool APossessor::UpdateLandedElapsed(float deltaTime)
 {
 	LandedTimeElapsed += deltaTime;
-	bool bIsFinished = false;
+	bool hasRowsToDelete = false;
 	if (HasReachedTimeLimit(LandedTimeElapsed, LandedTimeLimit))
 	{
-		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true) // block must be below in order to drop block
-		{
-			bIsFinished = true;
+		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true)// block must be below in order to drop block																 
+		{   
+			if(FilterForDeletion(CurrentTetromino->GetTetrominoRows()).Num() != 0) 
+			{ // checks if there is a row to delete, to which mini game is activated and deletion is deferred until after
+				hasRowsToDelete = true;
+			}
+			else
+			{
+				StartDeletionProcess(0);
+				LandedTimeElapsed = 0.0f;
+				bHasTetrominoLanded = false;
+				FallTimeElapsed = 0.0f;
+			}
 		}
-		LandedTimeElapsed = 0.0f;
-		bHasTetrominoLanded = false;
-		FallTimeElapsed = 0.0f;
 	}
-	return bIsFinished;
+	return hasRowsToDelete;
 }
 
-void APossessor::MoveHorizontal(float axisValue)
+void APossessor::MoveHorizontally(float axisValue)
 {
 	PreviousHorizontalMove = CurrentHorizontalMove;
 	CurrentHorizontalMove = axisValue;
 	if (CurrentHorizontalMove == 0.0f ||
-		(PreviousHorizontalMove > 0.0f && CurrentHorizontalMove < 0.0f) ||
-		(PreviousHorizontalMove < 0.0f && CurrentHorizontalMove > 0.0f))
+		(PreviousHorizontalMove >= 0.0f && CurrentHorizontalMove < 0.0f) ||
+		(PreviousHorizontalMove <= 0.0f && CurrentHorizontalMove > 0.0f))
 	{
 		bIsFastHorizontal = false;
 		bHasInitiatedHorizMove = false;
@@ -273,18 +278,30 @@ void APossessor::MoveHorizontal(float axisValue)
 	}
 }
 
-void APossessor::MoveDown(float axisValue)
+void APossessor::MoveVertically(float axisValue)
 {
-	if (axisValue <= 0.0f)
+	PreviousVerticalMove = CurrentVerticalMove;
+	CurrentVerticalMove = axisValue;
+	if (CurrentVerticalMove == 0.0f) 
+	{ 
+		if (CurrentHorizontalMove == 0) { CurrentArrow = "none"; bIsKeyProcessed = true; }
+		bIsFastFall = bIsRotationKeyHeld = false;
+		FastFallTimeElapsed = 0.0f;
+	}
+	else if (CurrentVerticalMove > 0.0f) // rotation (up)
 	{
+		if (!bIsRotationKeyHeld && !bIsRotating) { bIsRotating = true; }
+		if (PreviousVerticalMove <= 0.0f && bIsKeyProcessed) { CurrentArrow = "up"; bIsKeyProcessed = false; }
+		bIsRotationKeyHeld = true;
 		bIsFastFall = false;
 		FastFallTimeElapsed = 0.0f;
 	}
-	else
+	else if (CurrentVerticalMove < 0.0f) // fast fall (down)
 	{
+		if (PreviousVerticalMove >= 0.0f && bIsKeyProcessed) { CurrentArrow = "down"; bIsKeyProcessed = false; }
 		bIsFastFall = true;
+		bIsRotationKeyHeld = false;
 		FallTimeElapsed = 0.0f;
-		if (CurrentArrow != "down" && bIsKeyProcessed) { CurrentArrow = "down"; bIsKeyProcessed = false; }
 	}
 }
 
@@ -293,17 +310,6 @@ FVector2D APossessor::GetHorizontalMovement()
 	if (CurrentHorizontalMove > 0) { return FVector2D(1, 0); }
 	else if (CurrentHorizontalMove < 0) { return FVector2D(-1, 0); }
 	else { return FVector2D(0, 0); }
-}
-
-void APossessor::RotateKeyPressed()
-{
-	if (!bIsRotationKeyHeld && !bIsRotating) { bIsRotating = true; }
-	if (CurrentArrow != "up" && bIsKeyProcessed) { CurrentArrow = "up"; bIsKeyProcessed = false; }
-	bIsRotationKeyHeld = true;
-}
-void APossessor::RotateKeyReleased()
-{
-	bIsRotationKeyHeld = false;
 }
 
 TArray<int8> APossessor::FilterForDeletion(TArray<int8> potentialRows)
@@ -383,9 +389,10 @@ void APossessor::InstantDrop()
 	}
 }
 
-void APossessor::StartDeletionProcess()
+void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 {
 	TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
+	RowsToDelete = grid->GetExtraRows(RowsToDelete, extraRowsToDelete);
 	CurrentTetromino->EndLife(grid);
 	DeleteRows(RowsToDelete);
 	grid->DropRows();
@@ -395,27 +402,30 @@ void APossessor::StartDeletionProcess()
 bool APossessor::UpdateArrowMiniGame(float deltaTime)
 {
 	ArrowMiniTimeElapsed += deltaTime;
-	if (!HasReachedTimeLimit(ArrowMiniTimeElapsed, ArrowMiniTimeLimit) && !bIsKeyProcessed)
+	if (!HasReachedTimeLimit(ArrowMiniTimeElapsed, ArrowMiniTimeLimit))
 	{
-		if (ArrowSequenceIndex > -1 && ArrowSequenceIndex < ArrowSequence.Num() && CurrentArrow == ArrowSequence[ArrowSequenceIndex])
+		grid->SetBlockSprite(HighlightArrowSprite, ArrowSequencePosition);
+		if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow == ArrowSequence[ArrowSequencePosition.X])
 		{
-
-			++ArrowSequenceIndex;
+			++ArrowSequencePosition.X;
+			CurrentArrow = "none";
+			if (ArrowSequencePosition.X == ArrowSequence.Num())
+			{
+				ExtraRowsToDelete = 10;
+				return false;
+			}
 		}
 		bIsKeyProcessed = true;
+		return true;
 	}
-	else
-	{
-		ArrowMiniTimeElapsed = 0.0f;
-		return true; // true == finished mini game
-	}
-	return false;
+	ArrowMiniTimeElapsed = 0.0f;
+	return false; // false == finished mini game
 }
 
 void APossessor::CalculateArrowSequence()
 {
 	ArrowSequence.Empty();
-	ArrowSequenceIndex = 0;
+	ArrowSequencePosition.X = 0;
 	TArray<int8> rowsToExtract = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
 	for (int i = 0; i < rowsToExtract.Num(); ++i)
 	{
@@ -424,6 +434,8 @@ void APossessor::CalculateArrowSequence()
 			FString arrow = grid->GetBlock(FVector2D(j, rowsToExtract[i]))->GetArrowDirection();
 			ArrowSequence.Add(arrow);
 		}
+		ArrowSequencePosition.Y = rowsToExtract[i];
+		break; // only need one row
 	}
 }
 
