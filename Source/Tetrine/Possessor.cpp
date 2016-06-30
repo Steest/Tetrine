@@ -474,15 +474,10 @@ void APossessor::MapTetrominoArrows()
 		FVector2D tempPos = CurrentTetromino->blocks[i]->GetPosition();
 		grid->GetBlock(tempPos)->SetArrowDirection(CurrentTetromino->blocks[i]->GetArrowDirection());
 		grid->GetBlock(tempPos)->SetArrowVisibility(1);
-		CurrentTetromino->blocks[i]->AddActorLocalOffset(FVector(0.0f, -2.0f, 0.0f));
+		CurrentTetromino->blocks[i]->AddActorLocalOffset(FVector(0.0f, -4.0f, 0.0f));
 	}
 }
 
-//
-// needs to be finished
-//
-// waiting for individual colors of the blocks to happen first
-//
 void APossessor::UpdateArrowMiniTimerBar()
 {
 	int blocksToColor = ArrowMiniTimeElapsed / ArrowMiniTimeLimit*10;

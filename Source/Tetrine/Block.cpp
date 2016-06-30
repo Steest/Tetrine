@@ -135,7 +135,7 @@ void ABlock::ChangeColor(FString color)
 	else if (color == "yellow") { newColor = FColor::FromHex("#E1E119"); }
 	else if (color == "purple") { newColor = FColor::FromHex("#7D32FA"); }
 	else if (color == "pink") { newColor = FColor::FromHex("#FA32C8"); }
-	else if (color == "grey" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
+	else if (color == "grey" || color == "white" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
 	else if (color == "black") { newColor = FColor::FromHex("#000000"); }
 	else { newColor = FColor::FromHex("#32E1FA"); } // turqouise-ish
 
