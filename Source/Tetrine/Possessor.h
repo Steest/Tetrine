@@ -114,4 +114,5 @@ public:
 	void CalculateArrowSequence();
 	TArray<FString> GetArrowSequence();
 	void MapTetrominoPositions();
+
 };
