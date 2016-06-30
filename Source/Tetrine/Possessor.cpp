@@ -21,18 +21,12 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/Highlight2Arrow_Sprite.Highlight2Arrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightRowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ArrowSpriteAsset(TEXT("PaperSprite'/Game/Art/Arrow_Sprite.Arrow_Sprite'"));
-	ConstructorHelpers::FObjectFinder<UPaperSprite> ArrowTimerBarAsset(TEXT("PaperSprite'/Game/Art/ArrowTimerBar_Sprite.ArrowTimerBar_Sprite'"));
 	
 	GhostSprite = GhostSpriteAsset.Get();
 	HighlightArrowSprite = HighlightArrowAsset.Get();
 	HighlightRowSprite = HighlightRowAsset.Get();
 	ArrowSprite = ArrowSpriteAsset.Get();
 	
-	ArrowTimerBar = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowTimerBar"));
-	ArrowTimerBar->SetSprite(ArrowTimerBarAsset.Object);
-	ArrowTimerBar->SetWorldScale3D(FVector(10.0f, 1.0f, 1.0f));
-	ArrowTimerBar->SetVisibility(false);
-
 	NextTetromino = "none";
 	FallTimeElapsed = 0.0f;
 	FastFallTimeElapsed = 0.0f;
@@ -65,16 +59,17 @@ APossessor::APossessor()
 	RotationMatrix.Emplace(FVector2D(-1, 0));
 }
 
-// Called when the game starts or when spawned
 void APossessor::BeginPlay()
 {
 	Super::BeginPlay();
 
 	MainCamera->SetWorldLocation(FVector(1000.0f, 7000.0f, 3000.0f));
 	MainCamera->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
+	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
+	MainCamera->SetOrthoWidth(12500.0f);
+	MainCamera->SetConstraintAspectRatio(true);
 }
 
-// Called every frame
 void APossessor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

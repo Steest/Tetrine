@@ -26,7 +26,6 @@ void AMyPlayerController::BeginPlay()
 	//	}
 
 	//	bShowMouseCursor = true;
-	}
 }
 
 

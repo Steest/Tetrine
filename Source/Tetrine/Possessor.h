@@ -37,8 +37,6 @@ public:
 	class UPaperSprite* HighlightRowSprite;
 	UPROPERTY(EditAnywhere, Category = "Anim")
 	class UPaperSprite* ArrowSprite;
-	UPROPERTY(EditAnywhere, Category="Anim")
-	class UPaperSpriteComponent* ArrowTimerBar;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")

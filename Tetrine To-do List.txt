@@ -3,7 +3,8 @@ To-do List
 
 X - Add Color to different tetromino shapes
 X - Add Row Arrows Minigame
-  - Add timer graphic that indicates time left for minigame
+X - Add timer graphic that indicates time left for minigame
+    - 
 - User interface
 - sounds
 - music
