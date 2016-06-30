@@ -142,6 +142,8 @@ void AGrid::TransferRow(int8 fromRow, int8 toRow)
 		matrix[i][toRow]->SetBlockSprite(matrix[i][fromRow]->GetBlockStatus());
 		matrix[i][toRow]->SetArrowDirection(matrix[i][fromRow]->GetArrowDirection());
 		matrix[i][toRow]->SetArrowVisibility(matrix[i][fromRow]->GetBlockStatus());
+		matrix[i][toRow]->SetColor(matrix[i][fromRow]->GetColor());
+		matrix[i][toRow]->ChangeColor(matrix[i][fromRow]->GetBlockStatus());
 	}
 }
 
@@ -156,11 +158,23 @@ TArray<int8> AGrid::GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows
 	return extraRows;
 }
 
-void AGrid::SetBlockSprite(UPaperSprite* sprite, FVector2D position)
+void AGrid::SetArrowSprite(UPaperSprite* sprite, FVector2D position)
 {
 	GetBlock(position)->ArrowSprite->SetSprite(sprite);
-	if (position.X - 1 >= 0)
+}
+
+void AGrid::SetRowArrowSprite(UPaperSprite* sprite, int8 row)
+{
+	for (int i = 0; i < GetWidth(); ++i)
 	{
-		//GetBlock(FVector2D(position.X - 1, position.Y))->SetBlockSprite(GetBlock(FVector2D(position.X - 1, position.Y))->GetBlockStatus());
+		SetArrowSprite(sprite, FVector2D(i, row));
+	}
+}
+
+void AGrid::SetRowColor(FString color, int8 row)
+{
+	for (int i = 0; i < GetWidth(); ++i)
+	{
+		GetBlock(FVector2D(i, row))->ChangeColor(color);
 	}
 }

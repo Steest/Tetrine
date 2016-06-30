@@ -10,7 +10,7 @@ ABlock::ABlock()
 	PrimaryActorTick.bCanEverTick = false;
 
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> EmptySpriteAsset(TEXT("PaperSprite'/Game/Art/empty_Sprite.empty_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> BlockSpriteAsset(TEXT("PaperSprite'/Game/Art/salmon_block_Sprite.salmon_block_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> BlockSpriteAsset(TEXT("PaperSprite'/Game/Art/gray_box_Sprite.gray_box_Sprite'"));
 	ConstructorHelpers::FObjectFinder<UPaperSprite> ArrowSpriteAsset(TEXT("PaperSprite'/Game/Art/Arrow_Sprite.Arrow_Sprite'"));
 	BlockSprite = BlockSpriteAsset.Get();
 	EmptySprite = EmptySpriteAsset.Get();
@@ -25,12 +25,13 @@ ABlock::ABlock()
 	ArrowSprite->SetSprite(ArrowSpriteAsset.Object);
 	ArrowSprite->AttachTo(BlockHitBox);
 	ArrowSprite->SetVisibility(false);
-	ArrowSprite->AddWorldOffset(FVector(0.0f, 2.0f, 0.0f));
+	ArrowSprite->AddWorldOffset(FVector(0.0f, 1.0f, 0.0f));
 
 	BlockStatus = 0;
 	Position.X = 0;
 	Position.Y = 0;
 	ArrowDirection = "none";
+	Color = "none";
 }
 
 void ABlock::BeginPlay()
@@ -110,4 +111,40 @@ void ABlock::SetArrowDirection(FString direction)
 	else if (direction == "left") { ArrowSprite->SetWorldRotation(FRotator(180.0f,0.0f,0.0f)); }
 	else { return; }
 	ArrowDirection = direction;
+}
+
+void ABlock::SetColor(FString color)
+{
+	Color = color;
+}
+
+FString ABlock::GetColor()
+{
+	return Color;
+}
+
+void ABlock::ChangeColor(FString color)
+{
+	FColor newColor;
+	if (color == "default" || color == "") { color = GetColor(); }
+
+	if (color == "red") { newColor = FColor::FromHex("#E14B32"); }
+	else if (color == "blue") { newColor = FColor::FromHex("#3264E1"); }
+	else if (color == "green") { newColor = FColor::FromHex("#19C819"); }
+	else if (color == "orange") { newColor = FColor::FromHex("#FA9619"); }
+	else if (color == "yellow") { newColor = FColor::FromHex("#E1E119"); }
+	else if (color == "purple") { newColor = FColor::FromHex("#7D32FA"); }
+	else if (color == "pink") { newColor = FColor::FromHex("#FA32C8"); }
+	else if (color == "grey" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
+	else if (color == "black") { newColor = FColor::FromHex("#000000"); }
+	else { newColor = FColor::FromHex("#32E1FA"); } // turqouise-ish
+
+	BlockHitBox->SetSpriteColor(newColor);
+}
+
+void ABlock::ChangeColor(int8 blockStatus)
+{
+	if (blockStatus == 0) { ChangeColor("empty"); }
+	else if (blockStatus == 1 || blockStatus == 2) { ChangeColor("default"); }
+	else { ChangeColor("none"); }
 }

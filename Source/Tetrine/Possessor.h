@@ -33,6 +33,12 @@ public:
 	class UPaperSprite* GhostSprite;
 	UPROPERTY(EditAnywhere, Category = "Anim")
 	class UPaperSprite* HighlightArrowSprite;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	class UPaperSprite* HighlightRowSprite;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	class UPaperSprite* ArrowSprite;
+	UPROPERTY(EditAnywhere, Category="Anim")
+	class UPaperSpriteComponent* ArrowTimerBar;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
@@ -113,6 +119,6 @@ public:
 	bool UpdateArrowMiniGame(float deltaTime);
 	void CalculateArrowSequence();
 	TArray<FString> GetArrowSequence();
-	void MapTetrominoPositions();
-
+	void MapTetrominoArrows();
+	void UpdateArrowMiniTimerBar();
 };

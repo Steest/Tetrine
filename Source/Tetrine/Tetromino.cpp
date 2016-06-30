@@ -22,6 +22,7 @@ void ATetromino::BeginPlay() // we dont know which BeginPlay will fire first bet
 		blocks[i]->SetBlockSprite(2);
 		blocks[i]->SetArrowVisibility(2);
 		blocks[i]->SetArrowDirection(GenerateRandomArrowDirection());
+		blocks[i]->ChangeColor("none");
 		// possessor places in the proper position
 	}
 }
@@ -53,8 +54,18 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	{
 		blocks[0]->SetPosition(FVector2D(4, 18));
 		blocks[1]->SetPosition(FVector2D(5, 18));
-		blocks[2]->SetPosition(FVector2D(4, 19)); // pivot (doesnt matter for square)
+		blocks[2]->SetPosition(FVector2D(4, 19)); // pivot
 		blocks[3]->SetPosition(FVector2D(5, 19));
+
+		blocks[0]->SetColor("red");
+		blocks[1]->SetColor("red");
+		blocks[2]->SetColor("red");
+		blocks[3]->SetColor("red");
+
+		blocks[0]->ChangeColor("red");
+		blocks[1]->ChangeColor("red");
+		blocks[2]->ChangeColor("red");
+		blocks[3]->ChangeColor("red");
 	}
 	else if (shape == "t")
 	{
@@ -62,6 +73,16 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[1]->SetPosition(FVector2D(3, 18));
 		blocks[2]->SetPosition(FVector2D(4, 18)); // pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
+
+		blocks[0]->SetColor("blue");
+		blocks[1]->SetColor("blue");
+		blocks[2]->SetColor("blue");
+		blocks[3]->SetColor("blue");
+
+		blocks[0]->ChangeColor("blue");
+		blocks[1]->ChangeColor("blue");
+		blocks[2]->ChangeColor("blue");
+		blocks[3]->ChangeColor("blue");
 	}
 	else if (shape == "z")
 	{
@@ -69,6 +90,16 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[1]->SetPosition(FVector2D(4, 18));
 		blocks[2]->SetPosition(FVector2D(4, 19)); //potentially messed up pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
+
+		blocks[0]->SetColor("green");
+		blocks[1]->SetColor("green");
+		blocks[2]->SetColor("green");
+		blocks[3]->SetColor("green");
+
+		blocks[0]->ChangeColor("green");
+		blocks[1]->ChangeColor("green");
+		blocks[2]->ChangeColor("green");
+		blocks[3]->ChangeColor("green");
 	}
 	else if (shape == "right bicep")
 	{
@@ -76,6 +107,16 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[1]->SetPosition(FVector2D(3, 18));
 		blocks[2]->SetPosition(FVector2D(4, 18)); // pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
+
+		blocks[0]->SetColor("yellow");
+		blocks[1]->SetColor("yellow");
+		blocks[2]->SetColor("yellow");
+		blocks[3]->SetColor("yellow");
+
+		blocks[0]->ChangeColor("yellow");
+		blocks[1]->ChangeColor("yellow");
+		blocks[2]->ChangeColor("yellow");
+		blocks[3]->ChangeColor("yellow");
 	}
 	else if (shape == "left bicep")
 	{
@@ -83,6 +124,16 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[1]->SetPosition(FVector2D(3, 18));
 		blocks[2]->SetPosition(FVector2D(4, 18)); //pivot
 		blocks[3]->SetPosition(FVector2D(5, 18));
+
+		blocks[0]->SetColor("pink");
+		blocks[1]->SetColor("pink");
+		blocks[2]->SetColor("pink");
+		blocks[3]->SetColor("pink");
+
+		blocks[0]->ChangeColor("pink");
+		blocks[1]->ChangeColor("pink");
+		blocks[2]->ChangeColor("pink");
+		blocks[3]->ChangeColor("pink");
 	}
 	else if (shape == "flat")
 	{
@@ -90,6 +141,16 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[1]->SetPosition(FVector2D(4, 19)); 
 		blocks[2]->SetPosition(FVector2D(5, 19)); // problem because rotates too much
 		blocks[3]->SetPosition(FVector2D(6, 19));
+
+		blocks[0]->SetColor("purple");
+		blocks[1]->SetColor("purple");
+		blocks[2]->SetColor("purple");
+		blocks[3]->SetColor("purple");
+
+		blocks[0]->ChangeColor("purple");
+		blocks[1]->ChangeColor("purple");
+		blocks[2]->ChangeColor("purple");
+		blocks[3]->ChangeColor("purple");
 	}
 	else if (shape == "s")
 	{
@@ -97,6 +158,16 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[1]->SetPosition(FVector2D(3, 18));
 		blocks[2]->SetPosition(FVector2D(4, 19)); //; pivot
 		blocks[3]->SetPosition(FVector2D(4, 18));
+
+		blocks[0]->SetColor("orange");
+		blocks[1]->SetColor("orange");
+		blocks[2]->SetColor("orange");
+		blocks[3]->SetColor("orange");
+
+		blocks[0]->ChangeColor("orange");
+		blocks[1]->ChangeColor("orange");
+		blocks[2]->ChangeColor("orange");
+		blocks[3]->ChangeColor("orange");
 	}
 	else
 	{
@@ -129,7 +200,7 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 		grid->GetBlock(newPosition)->SetBlockStatus(2); //grid has right collision matrix now
 		grid->GetBlock(newPosition)->SetBlockSprite(2);
 
-		FVector newLocation = blocks[i]->GetDimensions().X*FVector(blocks[i]->GetPosition().X, 0, blocks[i]->GetPosition().Y);
+		FVector newLocation = blocks[i]->GetDimensions().X*FVector(blocks[i]->GetPosition().X, 1, blocks[i]->GetPosition().Y);
 		blocks[i]->SetActorLocation(newLocation);
 	}
 }
@@ -250,7 +321,7 @@ void ATetromino::ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid)
 		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
 		blocks[i]->SetPosition(newPositions[i]);
 
-		FVector rotatedPosition = blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 0, newPositions[i].Y);
+		FVector rotatedPosition = blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 1, newPositions[i].Y);
 		blocks[i]->SetActorLocation(rotatedPosition);
 	}
 }

@@ -30,6 +30,8 @@ public:
 	FVector2D Position; // position on the grid
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	FString ArrowDirection;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	FString Color;
 
 	// methods
 	bool DoesBlockCollide(FVector2D movement, class AGrid* grid);
@@ -42,4 +44,9 @@ public:
 	void SetBlockSprite(int8 blockStatus);
 	FString GetArrowDirection();
 	void SetArrowDirection(FString direction);
+	void SetColor(FString color);
+	FString GetColor();
+	void ChangeColor(FString color);
+	void ChangeColor(int8 blockStatus);
+
 };
