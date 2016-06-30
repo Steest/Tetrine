@@ -110,7 +110,6 @@ void APossessor::Tick(float DeltaTime)
 				ArrowMiniTimeElapsed = 0.0f;
 				ExtraRowsToDelete = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
-				ArrowTimerBar->SetVisibility(false);
 			}
 		}
 	}
@@ -429,7 +428,6 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 		grid->SetArrowSprite(HighlightArrowSprite, ArrowSequencePosition);
 		if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow == ArrowSequence[ArrowSequencePosition.X])
 		{
-			UE_LOG(Possessor_log, Error, TEXT("ARROW MATCHED...%s == %s"), *CurrentArrow, *(ArrowSequence[ArrowSequencePosition.X]));
 			++ArrowSequencePosition.X;
 			CurrentArrow = "none";
 			if (ArrowSequencePosition.X == ArrowSequence.Num())
@@ -459,9 +457,9 @@ void APossessor::CalculateArrowSequence()
 			ArrowSequence.Add(arrow);
 		}
 		ArrowSequencePosition.Y = rowsToExtract[i];
-		ArrowTimerBar->SetVisibility(true);
 		break; // only need one row
 	}
+	grid->SetRowColor("grey",ArrowSequencePosition.Y);
 }
 
 TArray<FString> APossessor::GetArrowSequence()
@@ -476,7 +474,6 @@ void APossessor::MapTetrominoArrows()
 		FVector2D tempPos = CurrentTetromino->blocks[i]->GetPosition();
 		grid->GetBlock(tempPos)->SetArrowDirection(CurrentTetromino->blocks[i]->GetArrowDirection());
 		grid->GetBlock(tempPos)->SetArrowVisibility(1);
-		UE_LOG(Possessor_log, Warning, TEXT("Mapped %s to %s"), *tempPos.ToString(), *(CurrentTetromino->blocks[i]->GetArrowDirection()));
 		CurrentTetromino->blocks[i]->AddActorLocalOffset(FVector(0.0f, -2.0f, 0.0f));
 	}
 }
@@ -488,7 +485,9 @@ void APossessor::MapTetrominoArrows()
 //
 void APossessor::UpdateArrowMiniTimerBar()
 {
-	float theMath = 1.0f - 10.0f*(ArrowMiniTimeElapsed / ArrowMiniTimeLimit);
-	ArrowTimerBar->SetWorldLocation(FVector(ArrowTimerBar->GetSprite()->GetSourceSize().X*10, 1, ArrowSequencePosition.Y));
-	//ArrowTimerBar->SetWorldScale3D(FVector(-theMath, 1.0f, 1.0f));
+	int blocksToColor = ArrowMiniTimeElapsed / ArrowMiniTimeLimit*10;
+	for (int i = 0; i < blocksToColor; ++i)
+	{
+		grid->GetBlock(FVector2D(i, ArrowSequencePosition.Y))->ChangeColor("pink");
+	}
 }

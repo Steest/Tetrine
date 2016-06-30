@@ -39,4 +39,6 @@ public:
 	TArray<int8> GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows);
 	void SetArrowSprite(class UPaperSprite* sprite, FVector2D position);
 	void SetRowArrowSprite(class UPaperSprite* sprite, int8 row);
+	void SetRowColor(FString color, int8 row);
+
 };
