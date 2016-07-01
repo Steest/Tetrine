@@ -39,7 +39,7 @@ public:
 	class UPaperSprite* ArrowSprite;
 	UPROPERTY(EditAnywhere, Category="Anim")
 	class UPaperSpriteComponent* ArrowTimerBar;
-	UPROPERTY(EditAnywhere, Category = "Tetromino")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;

@@ -16,22 +16,22 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	// variables
-	UPROPERTY(EditAnywhere, Category = "Anim")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Anim")
 	class UPaperSpriteComponent* BlockHitBox;
-	UPROPERTY(EditAnywhere, Category = "Anim")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Anim")
 	class UPaperSpriteComponent* ArrowSprite;
-	UPROPERTY(EditAnywhere, Category = "Anim")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Anim")
 	class UPaperSprite* EmptySprite;
-	UPROPERTY(EditAnywhere, Category = "Anim")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Anim")
 	class UPaperSprite* BlockSprite;
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	int8 BlockStatus; // 0=empty,1=taken(static),2=taken(moving)
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	FVector2D Position; // position on the grid
-	UPROPERTY(VisibleAnywhere, Category = "Stats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stats")
 	FString ArrowDirection;
-	UPROPERTY(EditAnywhere, Category = "Anim")
-	FString Color;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	FString Color; 
 
 	// methods
 	bool DoesBlockCollide(FVector2D movement, class AGrid* grid);
