@@ -24,6 +24,8 @@ public:
 
 	// variables
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
+	FString NextTetromino;
+	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	class ATetromino* CurrentTetromino;
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	class AGrid* grid;
@@ -51,9 +53,7 @@ public:
 	class UAudioComponent* AllWrongSound;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* RotateSound;
-	UPROPERTY(EditAnywhere, Category = "Tetromino")
-UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetromino")
-	FString NextTetromino;
+	
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;
 	UPROPERTY(EditAnywhere, Category = "Movement")
