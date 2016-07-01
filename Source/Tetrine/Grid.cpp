@@ -31,10 +31,10 @@ void AGrid::Tick(float DeltaTime)
 
 void AGrid::GenerateMatrix(int scale)
 {
-	for (int i = 0; i < width; ++i)
+	for (int i = 0; i < GetWidth(); ++i)
 	{
 		TArray<ABlock*> tempRow;
-		for (int j = 0; j < height; ++j)
+		for (int j = 0; j < GetHeight(); ++j)
 		{
 			ABlock* tempBlock = SpawnBlock();
 			tempBlock->SetActorLocation(FVector(i*tempBlock->GetDimensions().X, 0, j*tempBlock->GetDimensions().Y));
@@ -63,7 +63,7 @@ bool AGrid::DropBlock(ABlock* block)
 
 int32 AGrid::GetHeight()
 {
-	return height-2;
+	return height;
 }
 
 int32 AGrid::GetWidth()
@@ -94,6 +94,8 @@ void AGrid::DeleteRow(int8 row)
 		matrix[i][row]->SetBlockSprite(0);
 		matrix[i][row]->SetBlockStatus(0);
 		matrix[i][row]->SetArrowVisibility(0);
+		matrix[i][row]->SetColor("empty");
+		matrix[i][row]->ChangeColor("empty");
 	}
 }
 
@@ -108,18 +110,18 @@ bool AGrid::ShouldDeleteRow(int8 row)
 
 void AGrid::DropRows()
 {
-	for (int i = 0; i < GetHeight(); ++i) 
+	for (int i = 0; i < GetHeight()-1; ++i) 
 	{
 		if(IsRowEmpty(i))
 		{
 			int8 DropFromRow = i+1; // in case the row above is empty, we seek the first row (above this row) that has blocks to drop
-			while (IsRowEmpty(DropFromRow) && DropFromRow < GetHeight()){ ++DropFromRow; }
-			int8 j = i;
-			while (DropFromRow < GetHeight() + 1)
+			while (DropFromRow < GetHeight() && IsRowEmpty(DropFromRow)){ ++DropFromRow; } 
+			int8 toRow = i;
+			while (DropFromRow < GetHeight())
 			{ 
-				TransferRow(DropFromRow,j);
+				TransferRow(DropFromRow,toRow);
 				++DropFromRow;
-				++j;
+				++toRow;
 			}
 		}
 	}

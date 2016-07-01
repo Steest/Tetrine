@@ -52,10 +52,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 { // must ensure that the 3rd block(block # 2 = 3 in 0 index)
 	if (shape == "square")
 	{
-		blocks[0]->SetPosition(FVector2D(4, 18));
-		blocks[1]->SetPosition(FVector2D(5, 18));
-		blocks[2]->SetPosition(FVector2D(4, 19)); // pivot
-		blocks[3]->SetPosition(FVector2D(5, 19));
+		blocks[0]->SetPosition(FVector2D(4, 20));
+		blocks[1]->SetPosition(FVector2D(5, 20));
+		blocks[2]->SetPosition(FVector2D(4, 21)); // pivot
+		blocks[3]->SetPosition(FVector2D(5, 21));
 
 		blocks[0]->SetColor("red");
 		blocks[1]->SetColor("red");
@@ -69,10 +69,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else if (shape == "t")
 	{
-		blocks[0]->SetPosition(FVector2D(4, 19));
-		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 18)); // pivot
-		blocks[3]->SetPosition(FVector2D(5, 18));
+		blocks[0]->SetPosition(FVector2D(4, 21));
+		blocks[1]->SetPosition(FVector2D(3, 20));
+		blocks[2]->SetPosition(FVector2D(4, 20)); // pivot
+		blocks[3]->SetPosition(FVector2D(5, 20));
 
 		blocks[0]->SetColor("blue");
 		blocks[1]->SetColor("blue");
@@ -86,10 +86,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else if (shape == "z")
 	{
-		blocks[0]->SetPosition(FVector2D(3, 19));
-		blocks[1]->SetPosition(FVector2D(4, 18));
-		blocks[2]->SetPosition(FVector2D(4, 19)); //potentially messed up pivot
-		blocks[3]->SetPosition(FVector2D(5, 18));
+		blocks[0]->SetPosition(FVector2D(3, 21));
+		blocks[1]->SetPosition(FVector2D(4, 20));
+		blocks[2]->SetPosition(FVector2D(4, 21)); //potentially messed up pivot
+		blocks[3]->SetPosition(FVector2D(5, 20));
 
 		blocks[0]->SetColor("green");
 		blocks[1]->SetColor("green");
@@ -103,10 +103,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else if (shape == "right bicep")
 	{
-		blocks[0]->SetPosition(FVector2D(5, 19));
-		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 18)); // pivot
-		blocks[3]->SetPosition(FVector2D(5, 18));
+		blocks[0]->SetPosition(FVector2D(5, 21));
+		blocks[1]->SetPosition(FVector2D(3, 20));
+		blocks[2]->SetPosition(FVector2D(4, 20)); // pivot
+		blocks[3]->SetPosition(FVector2D(5, 20));
 
 		blocks[0]->SetColor("yellow");
 		blocks[1]->SetColor("yellow");
@@ -120,10 +120,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else if (shape == "left bicep")
 	{
-		blocks[0]->SetPosition(FVector2D(3, 19));
-		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 18)); //pivot
-		blocks[3]->SetPosition(FVector2D(5, 18));
+		blocks[0]->SetPosition(FVector2D(3, 21));
+		blocks[1]->SetPosition(FVector2D(3, 20));
+		blocks[2]->SetPosition(FVector2D(4, 20)); //pivot
+		blocks[3]->SetPosition(FVector2D(5, 20));
 
 		blocks[0]->SetColor("pink");
 		blocks[1]->SetColor("pink");
@@ -137,10 +137,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else if (shape == "flat")
 	{
-		blocks[0]->SetPosition(FVector2D(3, 19));
-		blocks[1]->SetPosition(FVector2D(4, 19)); 
-		blocks[2]->SetPosition(FVector2D(5, 19)); // problem because rotates too much
-		blocks[3]->SetPosition(FVector2D(6, 19));
+		blocks[0]->SetPosition(FVector2D(3, 21));
+		blocks[1]->SetPosition(FVector2D(4, 21)); 
+		blocks[2]->SetPosition(FVector2D(5, 21)); // problem because rotates too much
+		blocks[3]->SetPosition(FVector2D(6, 21));
 
 		blocks[0]->SetColor("purple");
 		blocks[1]->SetColor("purple");
@@ -154,10 +154,10 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 	}
 	else if (shape == "s")
 	{
-		blocks[0]->SetPosition(FVector2D(5, 19));
-		blocks[1]->SetPosition(FVector2D(3, 18));
-		blocks[2]->SetPosition(FVector2D(4, 19)); //; pivot
-		blocks[3]->SetPosition(FVector2D(4, 18));
+		blocks[0]->SetPosition(FVector2D(5, 21));
+		blocks[1]->SetPosition(FVector2D(3, 20));
+		blocks[2]->SetPosition(FVector2D(4, 21)); //; pivot
+		blocks[3]->SetPosition(FVector2D(4, 20));
 
 		blocks[0]->SetColor("orange");
 		blocks[1]->SetColor("orange");

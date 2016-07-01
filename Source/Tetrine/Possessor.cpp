@@ -141,9 +141,8 @@ void APossessor::Tick(float DeltaTime)
 				bHasRowsToDelete = bHasTetrominoLanded = false; 
 				CurrentArrow = "none"; 
 				ArrowMiniTimeElapsed = 0.0f;
-				ExtraRowsToDelete = 0;
+				ExtraRowsToDelete = CurrentWrongTries = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
-				CurrentWrongTries = 0;
 			}
 		}
 	}
@@ -473,10 +472,7 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 				AllCorrectSound->Play();
 				return false;
 			}
-			else
-			{
-				OneCorrectSound->Play();
-			}
+			else { OneCorrectSound->Play(); }
 		}
 		else if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow != "none")
 		{
