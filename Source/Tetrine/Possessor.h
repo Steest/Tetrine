@@ -90,6 +90,8 @@ public:
 	bool bHasTetrominoLanded;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	bool bHasMatchStarted;
+	UPROPERTY(BlueprintReadWrite,VisibleAnywhere, Category = "Game")
+	bool bIsGameOver;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int8 MaxWrongTries;
 	UPROPERTY(VisibleAnywhere, Category = "Game")

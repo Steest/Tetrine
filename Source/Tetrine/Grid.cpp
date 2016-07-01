@@ -180,3 +180,16 @@ void AGrid::SetRowColor(FString color, int8 row)
 		GetBlock(FVector2D(i, row))->ChangeColor(color);
 	}
 }
+
+bool AGrid::IsBlockInDeadZone()
+{
+	for (int i = GetHeight()-2; i < GetHeight(); ++i)
+	{
+		for(int j = 0; j < GetWidth(); ++j)
+		{
+			UE_LOG(Grid_log, Error, TEXT("[%d][%d] status = %d"), j, i, GetBlock(FVector2D(j, i))->GetBlockStatus());
+			if(GetBlock(FVector2D(j,i))->GetBlockStatus() > 0) { return true; }
+		}
+	}
+	return false;
+}

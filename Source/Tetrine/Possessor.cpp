@@ -65,15 +65,15 @@ APossessor::APossessor()
 	CurrentHorizontalMove = 0.0f;
 	ArrowMiniTimeElapsed = 0.0f;
 
-	bool bIsFastHorizontal = false;
-	bool bHasInitiatedHorizMove = false;
-	bool bIsFastFall = false;
-	bool bHasTetrominoLanded = false;
-	bool bHasMatchStarted = false;
-	bool bIsRotating = false;
-	bool bIsRotationKeyHeld = false;
-	bool bHasChangedPositions = true;
-	bool bIsPlayingArrowMiniGame = false;
+	bIsFastHorizontal = false;
+	bHasInitiatedHorizMove = false;
+	bIsFastFall = false;
+	bHasTetrominoLanded = false;
+	bHasMatchStarted = false;
+	bIsGameOver = false;
+	bIsRotating = false;
+	bIsRotationKeyHeld = false;
+	bHasChangedPositions = true;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -112,7 +112,7 @@ void APossessor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bHasMatchStarted)
+	if (bHasMatchStarted && !bIsGameOver)
 	{
 		if (grid == nullptr) { UE_LOG(Possessor_log, Error, TEXT("Grid1 == nullptr")); return; }
 		if (CurrentTetromino == nullptr)
@@ -143,8 +143,13 @@ void APossessor::Tick(float DeltaTime)
 				ArrowMiniTimeElapsed = 0.0f;
 				ExtraRowsToDelete = CurrentWrongTries = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
+				bIsGameOver = grid->IsBlockInDeadZone();
 			}
 		}
+	}
+	else if (bIsGameOver)
+	{
+		TetrineTheme->Stop();
 	}
 	else
 	{
@@ -306,6 +311,7 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 				bHasTetrominoLanded = false;
 				FallTimeElapsed = 0.0f;
 				DropSound->Play();
+				bIsGameOver = grid->IsBlockInDeadZone();
 			}
 		}
 	}
