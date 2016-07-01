@@ -5,6 +5,7 @@ X - Add Color to different tetromino shapes
 X - Add Row Arrows Minigame
 X - Add timer graphic that indicates time left for minigame
     - 
+- Add saved block feature
 - User interface
 - sounds
 - music
