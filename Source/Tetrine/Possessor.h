@@ -37,6 +37,20 @@ public:
 	class UPaperSprite* HighlightRowSprite;
 	UPROPERTY(EditAnywhere, Category = "Anim")
 	class UPaperSprite* ArrowSprite;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* TetrineTheme;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* DropSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* OneCorrectSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* AllCorrectSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* OneWrongSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* AllWrongSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* RotateSound;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
@@ -76,6 +90,10 @@ public:
 	bool bHasTetrominoLanded;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	bool bHasMatchStarted;
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	int8 MaxWrongTries;
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	int8 CurrentWrongTries;
 	bool bIsRotating;
 	bool bIsRotationKeyHeld;
 	bool bIsInstantDropped;

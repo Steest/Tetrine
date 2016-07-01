@@ -27,6 +27,34 @@ APossessor::APossessor()
 	HighlightRowSprite = HighlightRowAsset.Get();
 	ArrowSprite = ArrowSpriteAsset.Get();
 	
+	TetrineTheme = CreateDefaultSubobject<UAudioComponent>(TEXT("TetrineTheme"));
+	ConstructorHelpers::FObjectFinder<USoundBase> TetrineThemeAsset(TEXT("SoundWave'/Game/SFX/TetrisTheme.TetrisTheme'"));
+	TetrineTheme->SetSound(TetrineThemeAsset.Object);
+
+	DropSound = CreateDefaultSubobject<UAudioComponent>(TEXT("DropSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> DropSoundAsset(TEXT("SoundWave'/Game/SFX/Drop1.Drop1'"));
+	DropSound->SetSound(DropSoundAsset.Object);
+	
+	OneCorrectSound = CreateDefaultSubobject<UAudioComponent>(TEXT("OneCorrectSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> OneCorrectSoundAsset(TEXT("SoundWave'/Game/SFX/OneCorrect2.OneCorrect2'"));
+	OneCorrectSound->SetSound(OneCorrectSoundAsset.Object);
+
+	AllCorrectSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AllCorrectSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> AllCorrectSoundAsset(TEXT("SoundWave'/Game/SFX/AllCorrect1.AllCorrect1'"));
+	AllCorrectSound->SetSound(AllCorrectSoundAsset.Object);
+
+	OneWrongSound = CreateDefaultSubobject<UAudioComponent>(TEXT("OneWrongSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> OneWrongSoundAsset(TEXT("SoundWave'/Game/SFX/OneWrong1.OneWrong1'"));
+	OneWrongSound->SetSound(OneWrongSoundAsset.Object);
+
+	AllWrongSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AllWrongSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> AllWrongSoundAsset(TEXT("SoundWave'/Game/SFX/AllWrong1.AllWrong1'"));
+	AllWrongSound->SetSound(AllWrongSoundAsset.Object);
+
+	RotateSound = CreateDefaultSubobject<UAudioComponent>(TEXT("RotateSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> RotateSoundAsset(TEXT("SoundWave'/Game/SFX/Rotate1.Rotate1'"));
+	RotateSound->SetSound(RotateSoundAsset.Object);
+
 	NextTetromino = "none";
 	FallTimeElapsed = 0.0f;
 	FastFallTimeElapsed = 0.0f;
@@ -57,6 +85,8 @@ APossessor::APossessor()
 	ArrowMiniTimeLimit = 2.0f;
 	RotationMatrix.Emplace(FVector2D(0, 1));
 	RotationMatrix.Emplace(FVector2D(-1, 0));
+	MaxWrongTries = 2;
+	CurrentWrongTries = 0;
 }
 
 void APossessor::BeginPlay()
@@ -68,6 +98,14 @@ void APossessor::BeginPlay()
 	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
 	MainCamera->SetOrthoWidth(12500.0f);
 	MainCamera->SetConstraintAspectRatio(true);
+
+	DropSound->Stop();
+	OneCorrectSound->Stop();
+	AllCorrectSound->Stop();
+	OneWrongSound->Stop();
+	AllWrongSound->Stop();
+	RotateSound->Stop();
+	TetrineTheme->Play();
 }
 
 void APossessor::Tick(float DeltaTime)
@@ -97,7 +135,7 @@ void APossessor::Tick(float DeltaTime)
 		}
 		else 
 		{ 
-			if (!UpdateArrowMiniGame(DeltaTime)) 
+			if (CurrentWrongTries >= MaxWrongTries || !UpdateArrowMiniGame(DeltaTime)) 
 			{
 				StartDeletionProcess(ExtraRowsToDelete); 
 				bHasRowsToDelete = bHasTetrominoLanded = false; 
@@ -105,6 +143,7 @@ void APossessor::Tick(float DeltaTime)
 				ArrowMiniTimeElapsed = 0.0f;
 				ExtraRowsToDelete = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
+				CurrentWrongTries = 0;
 			}
 		}
 	}
@@ -267,6 +306,7 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 				LandedTimeElapsed = 0.0f;
 				bHasTetrominoLanded = false;
 				FallTimeElapsed = 0.0f;
+				DropSound->Play();
 			}
 		}
 	}
@@ -354,6 +394,7 @@ void APossessor::UpdateRotations()
 	if (CurrentTetromino->CanShiftPositions(newPositions, grid))
 	{
 		CurrentTetromino->ApplyRotation(newPositions, grid);
+		RotateSound->Play();
 	}
 	bIsRotating = false;
 }
@@ -425,13 +466,26 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 		{
 			++ArrowSequencePosition.X;
 			CurrentArrow = "none";
+			
 			if (ArrowSequencePosition.X == ArrowSequence.Num())
 			{
 				ExtraRowsToDelete = 2;
+				AllCorrectSound->Play();
 				return false;
 			}
+			else
+			{
+				OneCorrectSound->Play();
+			}
+		}
+		else if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow != "none")
+		{
+			++CurrentWrongTries;
+			if (CurrentWrongTries >= MaxWrongTries) { AllWrongSound->Play(); }
+			else { OneWrongSound->Play(); }
 		}
 		bIsKeyProcessed = true;
+		CurrentArrow = "none";
 		return true;
 	}
 	ArrowMiniTimeElapsed = 0.0f;
