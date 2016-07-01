@@ -51,8 +51,7 @@ public:
 	class UAudioComponent* AllWrongSound;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* RotateSound;
-	UPROPERTY(EditAnywhere, Category = "Tetromino")
-UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tetromino")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Tetromino")
 	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;

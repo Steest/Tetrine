@@ -96,7 +96,7 @@ void APossessor::BeginPlay()
 	MainCamera->SetWorldLocation(FVector(1000.0f, 7000.0f, 3000.0f));
 	MainCamera->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
 	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
-	MainCamera->SetOrthoWidth(12500.0f);
+	MainCamera->SetOrthoWidth(15000.0f);
 	MainCamera->SetConstraintAspectRatio(true);
 
 	DropSound->Stop();
