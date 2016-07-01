@@ -23,9 +23,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	// variables
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Tetromino")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	FString NextTetromino;
-	UPROPERTY(EditAnywhere, Category = "Tetromino")
+	UPROPERTY(VisibleAnywhere, Category = "Game")
+	FString SavedTetromino;
+	UPROPERTY(EditAnywhere, Category = "Game")
 	class ATetromino* CurrentTetromino;
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	class AGrid* grid;
@@ -103,6 +105,8 @@ public:
 	bool bHasChangedPositions;
 	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
+	bool bhasSavedTetromino;
+	bool bIsSaveTetroKeyHeld;
 
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
@@ -139,4 +143,7 @@ public:
 	TArray<FString> GetArrowSequence();
 	void MapTetrominoArrows();
 	void UpdateArrowMiniTimerBar();
+	void SaveTetroPressed();
+	void SaveTetroReleased();
+	void SaveTetromino();
 };

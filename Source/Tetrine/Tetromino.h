@@ -21,6 +21,8 @@ public:
 		TArray<class ABlock*> blocks;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 		FString DebugString;
+	UPROPERTY(EditAnywhere, Category = "Blocks")
+		FString Shape;
 
 	// methods
 	void EndLife(class AGrid* grid);

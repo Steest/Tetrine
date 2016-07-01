@@ -10,6 +10,7 @@ DEFINE_LOG_CATEGORY(Tetromino_log);
 ATetromino::ATetromino()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	Shape = "none";
 }
 
 void ATetromino::BeginPlay() // we dont know which BeginPlay will fire first between this, possessor, tetromino, grid, blocks
@@ -50,6 +51,7 @@ ABlock* ATetromino::SpawnBlock()
 
 void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bottom left to up right
 { // must ensure that the 3rd block(block # 2 = 3 in 0 index)
+	Shape = shape;
 	if (shape == "square")
 	{
 		blocks[0]->SetPosition(FVector2D(4, 20));

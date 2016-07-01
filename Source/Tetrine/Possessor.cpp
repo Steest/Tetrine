@@ -56,6 +56,7 @@ APossessor::APossessor()
 	RotateSound->SetSound(RotateSoundAsset.Object);
 
 	NextTetromino = "none";
+	SavedTetromino = "none";
 	FallTimeElapsed = 0.0f;
 	FastFallTimeElapsed = 0.0f;
 	HorizontalTimeElapsed = 0.0f;
@@ -74,6 +75,7 @@ APossessor::APossessor()
 	bIsRotating = false;
 	bIsRotationKeyHeld = false;
 	bHasChangedPositions = true;
+	bhasSavedTetromino = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -119,6 +121,8 @@ void APossessor::Tick(float DeltaTime)
 		{
 			CurrentTetromino = SpawnTetromino();
 			CurrentTetromino->SpawnShape(NextTetromino);
+			if (NextTetromino != "none") { CurrentTetromino->SpawnShape(NextTetromino); }
+			else { CurrentTetromino->SpawnShape(GenerateRandomTetromino()); }
 			NextTetromino = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
@@ -126,6 +130,7 @@ void APossessor::Tick(float DeltaTime)
 		}
 		if (!bHasRowsToDelete)
 		{
+			if (bIsSaveTetroKeyHeld && !bhasSavedTetromino) { SaveTetromino(); CurrentTetromino->Destroy(); CurrentTetromino = nullptr; bhasSavedTetromino = true; return; }
 			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
 			UpdateFallElapsed(DeltaTime);
 			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
@@ -144,6 +149,7 @@ void APossessor::Tick(float DeltaTime)
 				ExtraRowsToDelete = CurrentWrongTries = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
 				bIsGameOver = grid->IsBlockInDeadZone();
+				bhasSavedTetromino = false;
 			}
 		}
 	}
@@ -178,6 +184,9 @@ void APossessor::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 	InputComponent->BindAction("InstantDrop", EInputEvent::IE_Pressed, this, &APossessor::InstantDropPressed);
 	InputComponent->BindAction("InstantDrop", EInputEvent::IE_Released, this, &APossessor::InstantDropReleased);
+
+	InputComponent->BindAction("SaveTetro", EInputEvent::IE_Pressed, this, &APossessor::SaveTetroPressed);
+	InputComponent->BindAction("SaveTetro", EInputEvent::IE_Released, this, &APossessor::SaveTetroReleased);
 }
 
 AGrid* APossessor::SpawnGrid()
@@ -312,6 +321,7 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 				FallTimeElapsed = 0.0f;
 				DropSound->Play();
 				bIsGameOver = grid->IsBlockInDeadZone();
+				bhasSavedTetromino = false;
 			}
 		}
 	}
@@ -535,5 +545,31 @@ void APossessor::UpdateArrowMiniTimerBar()
 	for (int i = 0; i < blocksToColor; ++i)
 	{
 		grid->GetBlock(FVector2D(i, ArrowSequencePosition.Y))->ChangeColor("pink");
+	}
+}
+
+void APossessor::SaveTetroPressed()
+{
+	bIsSaveTetroKeyHeld = true;
+}
+
+void APossessor::SaveTetroReleased()
+{
+	bIsSaveTetroKeyHeld = false;
+}
+
+void APossessor::SaveTetromino()
+{
+	NextTetromino = SavedTetromino;
+	SavedTetromino = CurrentTetromino->Shape;
+	for (int i = 0; i < 4; ++i)
+	{
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockStatus(0);
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockSprite(0);
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetColor("empty");
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->ChangeColor(0);
+		UE_LOG(Possessor_log, Error, TEXT("Saved: i: %d"),i);
+		CurrentTetromino->blocks[i]->Destroy();
+		CurrentTetromino->blocks[i] = nullptr;
 	}
 }
