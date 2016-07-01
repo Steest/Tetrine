@@ -23,6 +23,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	// variables
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Tetromino")
+	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Tetromino")
 	class ATetromino* CurrentTetromino;
 	UPROPERTY(EditAnywhere, Category = "Grid")
@@ -51,8 +53,6 @@ public:
 	class UAudioComponent* AllWrongSound;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* RotateSound;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Tetromino")
-	FString NextTetromino;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;
 	UPROPERTY(EditAnywhere, Category = "Movement")
