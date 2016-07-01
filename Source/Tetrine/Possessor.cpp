@@ -21,17 +21,39 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/Highlight2Arrow_Sprite.Highlight2Arrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightRowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ArrowSpriteAsset(TEXT("PaperSprite'/Game/Art/Arrow_Sprite.Arrow_Sprite'"));
-	ConstructorHelpers::FObjectFinder<UPaperSprite> ArrowTimerBarAsset(TEXT("PaperSprite'/Game/Art/ArrowTimerBar_Sprite.ArrowTimerBar_Sprite'"));
 	
 	GhostSprite = GhostSpriteAsset.Get();
 	HighlightArrowSprite = HighlightArrowAsset.Get();
 	HighlightRowSprite = HighlightRowAsset.Get();
 	ArrowSprite = ArrowSpriteAsset.Get();
 	
-	ArrowTimerBar = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowTimerBar"));
-	ArrowTimerBar->SetSprite(ArrowTimerBarAsset.Object);
-	ArrowTimerBar->SetWorldScale3D(FVector(10.0f, 1.0f, 1.0f));
-	ArrowTimerBar->SetVisibility(false);
+	TetrineTheme = CreateDefaultSubobject<UAudioComponent>(TEXT("TetrineTheme"));
+	ConstructorHelpers::FObjectFinder<USoundBase> TetrineThemeAsset(TEXT("SoundWave'/Game/SFX/TetrisTheme.TetrisTheme'"));
+	TetrineTheme->SetSound(TetrineThemeAsset.Object);
+
+	DropSound = CreateDefaultSubobject<UAudioComponent>(TEXT("DropSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> DropSoundAsset(TEXT("SoundWave'/Game/SFX/Drop1.Drop1'"));
+	DropSound->SetSound(DropSoundAsset.Object);
+	
+	OneCorrectSound = CreateDefaultSubobject<UAudioComponent>(TEXT("OneCorrectSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> OneCorrectSoundAsset(TEXT("SoundWave'/Game/SFX/OneCorrect2.OneCorrect2'"));
+	OneCorrectSound->SetSound(OneCorrectSoundAsset.Object);
+
+	AllCorrectSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AllCorrectSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> AllCorrectSoundAsset(TEXT("SoundWave'/Game/SFX/AllCorrect1.AllCorrect1'"));
+	AllCorrectSound->SetSound(AllCorrectSoundAsset.Object);
+
+	OneWrongSound = CreateDefaultSubobject<UAudioComponent>(TEXT("OneWrongSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> OneWrongSoundAsset(TEXT("SoundWave'/Game/SFX/OneWrong1.OneWrong1'"));
+	OneWrongSound->SetSound(OneWrongSoundAsset.Object);
+
+	AllWrongSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AllWrongSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> AllWrongSoundAsset(TEXT("SoundWave'/Game/SFX/AllWrong1.AllWrong1'"));
+	AllWrongSound->SetSound(AllWrongSoundAsset.Object);
+
+	RotateSound = CreateDefaultSubobject<UAudioComponent>(TEXT("RotateSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> RotateSoundAsset(TEXT("SoundWave'/Game/SFX/Rotate1.Rotate1'"));
+	RotateSound->SetSound(RotateSoundAsset.Object);
 
 	NextTetromino = "none";
 	FallTimeElapsed = 0.0f;
@@ -43,15 +65,15 @@ APossessor::APossessor()
 	CurrentHorizontalMove = 0.0f;
 	ArrowMiniTimeElapsed = 0.0f;
 
-	bool bIsFastHorizontal = false;
-	bool bHasInitiatedHorizMove = false;
-	bool bIsFastFall = false;
-	bool bHasTetrominoLanded = false;
-	bool bHasMatchStarted = false;
-	bool bIsRotating = false;
-	bool bIsRotationKeyHeld = false;
-	bool bHasChangedPositions = true;
-	bool bIsPlayingArrowMiniGame = false;
+	bIsFastHorizontal = false;
+	bHasInitiatedHorizMove = false;
+	bIsFastFall = false;
+	bHasTetrominoLanded = false;
+	bHasMatchStarted = false;
+	bIsGameOver = false;
+	bIsRotating = false;
+	bIsRotationKeyHeld = false;
+	bHasChangedPositions = true;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -63,23 +85,34 @@ APossessor::APossessor()
 	ArrowMiniTimeLimit = 2.0f;
 	RotationMatrix.Emplace(FVector2D(0, 1));
 	RotationMatrix.Emplace(FVector2D(-1, 0));
+	MaxWrongTries = 2;
+	CurrentWrongTries = 0;
 }
 
-// Called when the game starts or when spawned
 void APossessor::BeginPlay()
 {
 	Super::BeginPlay();
 
 	MainCamera->SetWorldLocation(FVector(1000.0f, 7000.0f, 3000.0f));
 	MainCamera->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
+	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
+	MainCamera->SetOrthoWidth(12500.0f);
+	MainCamera->SetConstraintAspectRatio(true);
+
+	DropSound->Stop();
+	OneCorrectSound->Stop();
+	AllCorrectSound->Stop();
+	OneWrongSound->Stop();
+	AllWrongSound->Stop();
+	RotateSound->Stop();
+	TetrineTheme->Play();
 }
 
-// Called every frame
 void APossessor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bHasMatchStarted)
+	if (bHasMatchStarted && !bIsGameOver)
 	{
 		if (grid == nullptr) { UE_LOG(Possessor_log, Error, TEXT("Grid1 == nullptr")); return; }
 		if (CurrentTetromino == nullptr)
@@ -102,16 +135,21 @@ void APossessor::Tick(float DeltaTime)
 		}
 		else 
 		{ 
-			if (!UpdateArrowMiniGame(DeltaTime)) 
+			if (CurrentWrongTries >= MaxWrongTries || !UpdateArrowMiniGame(DeltaTime)) 
 			{
 				StartDeletionProcess(ExtraRowsToDelete); 
 				bHasRowsToDelete = bHasTetrominoLanded = false; 
 				CurrentArrow = "none"; 
 				ArrowMiniTimeElapsed = 0.0f;
-				ExtraRowsToDelete = 0;
+				ExtraRowsToDelete = CurrentWrongTries = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
+				bIsGameOver = grid->IsBlockInDeadZone();
 			}
 		}
+	}
+	else if (bIsGameOver)
+	{
+		TetrineTheme->Stop();
 	}
 	else
 	{
@@ -272,6 +310,8 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 				LandedTimeElapsed = 0.0f;
 				bHasTetrominoLanded = false;
 				FallTimeElapsed = 0.0f;
+				DropSound->Play();
+				bIsGameOver = grid->IsBlockInDeadZone();
 			}
 		}
 	}
@@ -359,6 +399,7 @@ void APossessor::UpdateRotations()
 	if (CurrentTetromino->CanShiftPositions(newPositions, grid))
 	{
 		CurrentTetromino->ApplyRotation(newPositions, grid);
+		RotateSound->Play();
 	}
 	bIsRotating = false;
 }
@@ -430,13 +471,23 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 		{
 			++ArrowSequencePosition.X;
 			CurrentArrow = "none";
+			
 			if (ArrowSequencePosition.X == ArrowSequence.Num())
 			{
 				ExtraRowsToDelete = 2;
+				AllCorrectSound->Play();
 				return false;
 			}
+			else { OneCorrectSound->Play(); }
+		}
+		else if (ArrowSequence.IsValidIndex(ArrowSequencePosition.X) && CurrentArrow != "none")
+		{
+			++CurrentWrongTries;
+			if (CurrentWrongTries >= MaxWrongTries) { AllWrongSound->Play(); }
+			else { OneWrongSound->Play(); }
 		}
 		bIsKeyProcessed = true;
+		CurrentArrow = "none";
 		return true;
 	}
 	ArrowMiniTimeElapsed = 0.0f;
