@@ -98,8 +98,8 @@ public:
 	int8 MaxWrongTries;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	int8 CurrentWrongTries;
-	UPROPERTY(EditAnywhere, Category = "Game")
-	int64 Lines;
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = "Game")
+	int Lines;
 	bool bIsRotating;
 	bool bIsRotationKeyHeld;
 	bool bIsInstantDropped;
