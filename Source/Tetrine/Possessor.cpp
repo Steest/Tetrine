@@ -89,6 +89,7 @@ APossessor::APossessor()
 	RotationMatrix.Emplace(FVector2D(-1, 0));
 	MaxWrongTries = 2;
 	CurrentWrongTries = 0;
+	Lines = 0;
 }
 
 void APossessor::BeginPlay()
@@ -467,6 +468,7 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 	DeleteRows(RowsToDelete);
 	grid->DropRows();
 	CurrentTetromino = nullptr;
+	Lines += RowsToDelete.Num();
 }
 
 bool APossessor::UpdateArrowMiniGame(float deltaTime)
