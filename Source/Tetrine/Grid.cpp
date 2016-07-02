@@ -11,6 +11,9 @@ AGrid::AGrid()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> EmptySpriteAsset(TEXT("PaperSprite'/Game/Art/empty_Sprite.empty_Sprite'"));
+	EmptyCell = EmptySpriteAsset.Get();
+
 	width = 10;
 	height = 22;
 
@@ -192,4 +195,18 @@ bool AGrid::IsBlockInDeadZone()
 		}
 	}
 	return false;
+}
+
+void AGrid::Clear()
+{
+	for (int i = 0; i < GetHeight(); ++i)
+	{
+		DeleteRow(i);
+	}
+}
+
+void AGrid::SetBlockCellSprite(class UPaperSprite* sprite, FVector2D position)
+{
+	GetBlock(position)->BlockHitBox->SetSprite(sprite);
+	
 }

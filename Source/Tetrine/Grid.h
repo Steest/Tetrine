@@ -18,6 +18,7 @@ public:
 
 	// variables
 	class UPaperSpriteComponent* GridComponent;
+	class UPaperSprite* EmptyCell;
 
 	int32 width;
 	int32 height;
@@ -41,4 +42,7 @@ public:
 	void SetRowArrowSprite(class UPaperSprite* sprite, int8 row);
 	void SetRowColor(FString color, int8 row);
 	bool IsBlockInDeadZone();
+	UFUNCTION(BlueprintCallable, Category = "Reset Grid")
+	void Clear();
+	void SetBlockCellSprite(class UPaperSprite* sprite, FVector2D position);
 };

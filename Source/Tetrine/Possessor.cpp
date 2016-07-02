@@ -157,6 +157,7 @@ void APossessor::Tick(float DeltaTime)
 	else if (bIsGameOver)
 	{
 		TetrineTheme->Stop();
+		grid->Clear();
 	}
 	else
 	{
