@@ -112,24 +112,24 @@ public:
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
 
-	UPROPERTY(EditAnywhere,Category="Game")
-	float FinalFallTL = 0.2f;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float FinalLandedTL = 0.3f;
+	float FinalFallTL;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float FinalArrowMiniTL = 1.5f;
+	float FinalLandedTL;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float FallMultiplier = 0.025f;
+	float FinalArrowMiniTL;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float LandedMultiplier = 0.025f;
+	float FallMultiplier;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float ArrowMiniMultiplier = 0.025f;
+	float LandedMultiplier;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float InitialFallTL = 1.25f;
+	float ArrowMiniMultiplier;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float InitialLandedTL = 0.75f;
+	float InitialFallTL;
 	UPROPERTY(EditAnywhere, Category = "Game")
-	float InitialArrowMiniTL = 3.5f;
+	float InitialLandedTL;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float InitialArrowMiniTL;
 
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
