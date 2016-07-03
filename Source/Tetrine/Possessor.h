@@ -25,7 +25,7 @@ public:
 	// variables
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	FString NextTetromino;
-	UPROPERTY(VisibleAnywhere, Category = "Game")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game")
 	FString SavedTetromino;
 	UPROPERTY(EditAnywhere, Category = "Game")
 	class ATetromino* CurrentTetromino;
@@ -100,6 +100,8 @@ public:
 	int8 CurrentWrongTries;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = "Game")
 	int Lines;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game")
+	int Level;
 	bool bIsRotating;
 	bool bIsRotationKeyHeld;
 	bool bIsInstantDropped;
@@ -109,6 +111,25 @@ public:
 	bool bIsKeyProcessed;
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
+
+	UPROPERTY(EditAnywhere,Category="Game")
+	float FinalFallTL = 0.2f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float FinalLandedTL = 0.3f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float FinalArrowMiniTL = 1.5f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float FallMultiplier = 0.025f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float LandedMultiplier = 0.025f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float ArrowMiniMultiplier = 0.025f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float InitialFallTL = 1.25f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float InitialLandedTL = 0.75f;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float InitialArrowMiniTL = 3.5f;
 
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
@@ -148,4 +169,7 @@ public:
 	void SaveTetroPressed();
 	void SaveTetroReleased();
 	void SaveTetromino();
+	int GetLevel();
+	void SetLevel(int level);
+	void ChangeLevel(int level);
 };
