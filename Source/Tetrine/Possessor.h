@@ -25,9 +25,9 @@ public:
 	// variables
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	FString NextTetromino;
-	UPROPERTY(VisibleAnywhere, Category = "Game")
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Game")
 	FString SavedTetromino;
-	UPROPERTY(EditAnywhere, Category = "Game")
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Game")
 	class ATetromino* CurrentTetromino;
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	class AGrid* grid;
@@ -107,6 +107,7 @@ public:
 	bool bHasChangedPositions;
 	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
+	UPROPERTY(BlueprintReadWrite,Category = "Game")
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
 
