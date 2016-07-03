@@ -109,6 +109,7 @@ public:
 	bool bHasChangedPositions;
 	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
+	UPROPERTY(BlueprintReadWrite, Category = "Possessor")
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
 
