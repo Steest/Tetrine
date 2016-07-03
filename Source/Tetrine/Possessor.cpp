@@ -80,16 +80,27 @@ APossessor::APossessor()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	FallTimeLimit = 1.0f;
-	FastFallTimeLimit = 0.1f;
-	HorizontalTimeLimit = 0.3f;
+	FastFallTimeLimit = 0.05f;
+	HorizontalTimeLimit = 0.2f;
 	FastHorizTimeLimit = 0.05f;
 	LandedTimeLimit = 0.5f;
-	ArrowMiniTimeLimit = 2.0f;
+	ArrowMiniTimeLimit = 3.0f;
 	RotationMatrix.Emplace(FVector2D(0, 1));
 	RotationMatrix.Emplace(FVector2D(-1, 0));
 	MaxWrongTries = 2;
 	CurrentWrongTries = 0;
 	Lines = 0;
+	Level = 1;
+
+	FinalFallTL = 0.2f;
+	FinalLandedTL = 0.3f;
+	FinalArrowMiniTL = 1.5f;
+	FallMultiplier = 0.025f;
+	LandedMultiplier = 0.025f;
+	ArrowMiniMultiplier = 0.025f;
+	InitialFallTL = 1.25f;
+	InitialLandedTL = 0.75f;
+	InitialArrowMiniTL = 3.5f;
 }
 
 void APossessor::BeginPlay()
@@ -108,7 +119,7 @@ void APossessor::BeginPlay()
 	OneWrongSound->Stop();
 	AllWrongSound->Stop();
 	RotateSound->Stop();
-	TetrineTheme->Play();
+	TetrineTheme->Stop();
 }
 
 void APossessor::Tick(float DeltaTime)
@@ -575,4 +586,22 @@ void APossessor::SaveTetromino()
 		CurrentTetromino->blocks[i]->Destroy();
 		CurrentTetromino->blocks[i] = nullptr;
 	}
+}
+
+int APossessor::GetLevel()
+{
+	return Level;
+}
+
+void APossessor::SetLevel(int level)
+{
+	Level = level;
+}
+
+void APossessor::ChangeLevel(int level)
+{
+	if (level == 0) { return; }
+	FallTimeLimit = FMath::Clamp(InitialFallTL - (level*FallMultiplier), InitialFallTL, FinalFallTL);
+	LandedTimeLimit = FMath::Clamp(InitialLandedTL - (level*LandedMultiplier), InitialLandedTL, FinalLandedTL);
+	ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), InitialArrowMiniTL, FinalArrowMiniTL);
 }
