@@ -109,7 +109,6 @@ public:
 	bool bHasChangedPositions;
 	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
-	UPROPERTY(BlueprintReadWrite, Category = "Possessor")
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
 
@@ -174,7 +173,7 @@ public:
 	void SetLevel(int level);
 	void ChangeLevel();
 	int GetMultiplier();
-	void CalculateMultiplier( );
+	void CalculateMultiplier();
 
 	// scoring system - might be placed into a separate actor
 	UPROPERTY(EditAnywhere, Category = "Game")
