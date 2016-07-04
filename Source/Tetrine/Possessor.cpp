@@ -79,28 +79,29 @@ APossessor::APossessor()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
-	FallTimeLimit = 1.0f;
-	FastFallTimeLimit = 0.05f;
-	HorizontalTimeLimit = 0.2f;
-	FastHorizTimeLimit = 0.05f;
-	LandedTimeLimit = 0.5f;
-	ArrowMiniTimeLimit = 3.0f;
 	RotationMatrix.Emplace(FVector2D(0, 1));
 	RotationMatrix.Emplace(FVector2D(-1, 0));
 	MaxWrongTries = 2;
 	CurrentWrongTries = 0;
 	Lines = 0;
 	Level = 1;
+	Score = 0;
+	ScoreMultiplier = 1;
 
 	FinalFallTL = 0.2f;
 	FinalLandedTL = 0.3f;
 	FinalArrowMiniTL = 1.5f;
+	InitialFallTL = FallTimeLimit = 1.25f;
+	InitialLandedTL = LandedTimeLimit = 0.75f;
+	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.5f;
+	FastFallTimeLimit = 0.035f;
+	HorizontalTimeLimit = 0.2f;
+	FastHorizTimeLimit = 0.0175f;
 	FallMultiplier = 0.025f;
 	LandedMultiplier = 0.025f;
 	ArrowMiniMultiplier = 0.025f;
-	InitialFallTL = 1.25f;
-	InitialLandedTL = 0.75f;
-	InitialArrowMiniTL = 3.5f;
+
+	TetrominoOnGridTimer = 0.0f;
 }
 
 void APossessor::BeginPlay()
@@ -142,6 +143,7 @@ void APossessor::Tick(float DeltaTime)
 		}
 		if (!bHasRowsToDelete)
 		{
+			TetrominoOnGridTimer += DeltaTime;
 			if (bIsSaveTetroKeyHeld && !bhasSavedTetromino) { SaveTetromino(); CurrentTetromino->Destroy(); CurrentTetromino = nullptr; bhasSavedTetromino = true; return; }
 			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
 			UpdateFallElapsed(DeltaTime);
@@ -157,7 +159,7 @@ void APossessor::Tick(float DeltaTime)
 				StartDeletionProcess(ExtraRowsToDelete); 
 				bHasRowsToDelete = bHasTetrominoLanded = false; 
 				CurrentArrow = "none"; 
-				ArrowMiniTimeElapsed = 0.0f;
+				ArrowMiniTimeElapsed = TetrominoOnGridTimer = 0.0f;
 				ExtraRowsToDelete = CurrentWrongTries = 0;
 				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
 				bIsGameOver = grid->IsBlockInDeadZone();
@@ -335,6 +337,7 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 				DropSound->Play();
 				bIsGameOver = grid->IsBlockInDeadZone();
 				bhasSavedTetromino = false;
+				TetrominoOnGridTimer = 0.0f;
 			}
 		}
 	}
@@ -481,6 +484,10 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 	grid->DropRows();
 	CurrentTetromino = nullptr;
 	Lines += RowsToDelete.Num();
+	//add up new score
+	CalculateMultiplier();
+	AddToScore( (CalculateRowDropScore(RowsToDelete) + CalculateTetroDropScore())*GetMultiplier() );
+	ChangeLevel();
 }
 
 bool APossessor::UpdateArrowMiniGame(float deltaTime)
@@ -598,10 +605,65 @@ void APossessor::SetLevel(int level)
 	Level = level;
 }
 
-void APossessor::ChangeLevel(int level)
+void APossessor::ChangeLevel()
 {
-	if (level == 0) { return; }
-	FallTimeLimit = FMath::Clamp(InitialFallTL - (level*FallMultiplier), InitialFallTL, FinalFallTL);
-	LandedTimeLimit = FMath::Clamp(InitialLandedTL - (level*LandedMultiplier), InitialLandedTL, FinalLandedTL);
-	ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), InitialArrowMiniTL, FinalArrowMiniTL);
+	int level = (Score / 2500)+1;
+	SetLevel(level);
+	FallTimeLimit = FMath::Clamp(InitialFallTL - (level*FallMultiplier), FinalFallTL, InitialFallTL );
+	LandedTimeLimit = FMath::Clamp(InitialLandedTL - (level*LandedMultiplier), FinalLandedTL, InitialLandedTL);
+	ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), FinalArrowMiniTL, InitialArrowMiniTL );
+}
+
+int APossessor::GetMultiplier()
+{
+	return ScoreMultiplier;
+}
+
+void APossessor::CalculateMultiplier()
+{
+	if (CurrentWrongTries == 2)
+	{
+		ScoreMultiplier = FMath::Clamp( (2*ScoreMultiplier) , 0, 8);
+	}
+	else if (CurrentWrongTries == 1) { return; }
+	else { ScoreMultiplier = 1; }
+}
+
+int APossessor::GetScore()
+{
+	return Score;
+}
+
+void APossessor::SetScore(int score)
+{
+	Score = score;
+}
+
+int APossessor::CalculateRowDropScore(TArray<int8> rowsDeleted)
+{
+	int result = 0;
+	for (int i = 0; i < rowsDeleted.Num(); ++i)
+	{
+		int temp = rowsDeleted[i] / 5;
+		if (temp == 0) { temp = 100; }
+		else if(temp == 1){ temp = 150; }
+		else if (temp == 2) { temp = 200; }
+		else if (temp == 3) { temp = 250; }
+		else { temp = 300; }
+		UE_LOG(Possessor_log, Warning, TEXT("ROW DROP SCORE: %d"), temp);
+		result += temp;
+	}
+	return result;
+}
+
+int APossessor::CalculateTetroDropScore()
+{
+	int result = FMath::Clamp( int(((grid->GetHeight()/2) - TetrominoOnGridTimer) * 5),0,300);
+	UE_LOG(Possessor_log, Warning, TEXT("TETRO DROP SCORE: %d"),result );
+	return result;
+}
+
+void APossessor::AddToScore(int score)
+{
+	Score += score;
 }

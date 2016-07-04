@@ -171,5 +171,20 @@ public:
 	void SaveTetromino();
 	int GetLevel();
 	void SetLevel(int level);
-	void ChangeLevel(int level);
+	void ChangeLevel();
+	int GetMultiplier();
+	void CalculateMultiplier( );
+
+	// scoring system - might be placed into a separate actor
+	UPROPERTY(EditAnywhere, Category = "Game")
+	int Score;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	int ScoreMultiplier;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	float TetrominoOnGridTimer;
+	int GetScore();
+	void SetScore(int score);
+	int CalculateRowDropScore(TArray<int8> rowsDeleted);
+	int CalculateTetroDropScore();
+	void AddToScore(int score);
 };
