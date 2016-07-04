@@ -21,7 +21,7 @@ public:
 		TArray<class ABlock*> blocks;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 		FString DebugString;
-	UPROPERTY(EditAnywhere, Category = "Blocks")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Blocks")
 		FString Shape;
 
 	// methods

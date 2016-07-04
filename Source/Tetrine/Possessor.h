@@ -27,7 +27,7 @@ public:
 	FString NextTetromino;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game")
 	FString SavedTetromino;
-	UPROPERTY(EditAnywhere, Category = "Game")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	class ATetromino* CurrentTetromino;
 	UPROPERTY(EditAnywhere, Category = "Grid")
 	class AGrid* grid;
