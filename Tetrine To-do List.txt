@@ -8,7 +8,8 @@ X - Add saved block feature
 X - win/lose conditions
 - User interface
   - redesign with cross design
-  - set the grid properly
+  - set the grid properly (screen resolution)
+  - pause button toggle
 - sounds
   - redesign sounds
 - music
