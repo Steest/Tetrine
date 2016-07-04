@@ -176,7 +176,7 @@ public:
 	void CalculateMultiplier();
 
 	// scoring system - might be placed into a separate actor
-	UPROPERTY(EditAnywhere, Category = "Game")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	int Score;
 	UPROPERTY(EditAnywhere, Category = "Game")
 	int ScoreMultiplier;
