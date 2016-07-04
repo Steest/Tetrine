@@ -5,12 +5,20 @@ X - Add Color to different tetromino shapes
 X - Add Row Arrows Minigame
 X - Add timer graphic that indicates time left for minigame
 X - Add saved block feature
-- User interface
-- sounds
-- music
-- scoring system
-- menu 
 X - win/lose conditions
+- User interface
+  - redesign with cross design
+  - set the grid properly
+- sounds
+  - redesign sounds
+- music
+  - maybe get a new theme, or make one
+- scoring system
+  - add "+score" component to 
+  - tweak system to polish 
+- menu 
+  - tighten it up a bit
 - Row drop animation
-- Add UI change to indicate in Arrow Mini
-- 
+- Add UI change to indicate in Arrow Mini Game
+  - make the mini more clear as to what to do
+  - tighten up the animations and art a bit

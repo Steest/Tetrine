@@ -93,7 +93,7 @@ APossessor::APossessor()
 	FinalArrowMiniTL = 1.25f;
 	InitialFallTL = FallTimeLimit = 1.00f;
 	InitialLandedTL = LandedTimeLimit = 0.50f;
-	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.25f;
+	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.50f;
 	FastFallTimeLimit = 0.035f;
 	HorizontalTimeLimit = 0.175f;
 	FastHorizTimeLimit = 0.0175f;
