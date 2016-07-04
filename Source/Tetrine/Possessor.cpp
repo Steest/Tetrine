@@ -88,18 +88,18 @@ APossessor::APossessor()
 	Score = 0;
 	ScoreMultiplier = 1;
 
-	FinalFallTL = 0.2f;
-	FinalLandedTL = 0.3f;
-	FinalArrowMiniTL = 1.5f;
-	InitialFallTL = FallTimeLimit = 1.25f;
-	InitialLandedTL = LandedTimeLimit = 0.75f;
-	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.5f;
+	FinalFallTL = 0.05f;
+	FinalLandedTL = 0.2f;
+	FinalArrowMiniTL = 1.25f;
+	InitialFallTL = FallTimeLimit = 1.00f;
+	InitialLandedTL = LandedTimeLimit = 0.50f;
+	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.50f;
 	FastFallTimeLimit = 0.035f;
-	HorizontalTimeLimit = 0.2f;
+	HorizontalTimeLimit = 0.175f;
 	FastHorizTimeLimit = 0.0175f;
-	FallMultiplier = 0.025f;
+	FallMultiplier = 0.050f;
 	LandedMultiplier = 0.025f;
-	ArrowMiniMultiplier = 0.025f;
+	ArrowMiniMultiplier = 0.1f;
 
 	TetrominoOnGridTimer = 0.0f;
 }
@@ -485,7 +485,7 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 	CurrentTetromino = nullptr;
 	Lines += RowsToDelete.Num();
 	//add up new score
-	CalculateMultiplier();
+	if(bHasRowsToDelete){ CalculateMultiplier(); }
 	AddToScore( (CalculateRowDropScore(RowsToDelete) + CalculateTetroDropScore())*GetMultiplier() );
 	ChangeLevel();
 }
@@ -621,7 +621,7 @@ int APossessor::GetMultiplier()
 
 void APossessor::CalculateMultiplier()
 {
-	if (CurrentWrongTries == 2)
+	if (CurrentWrongTries == 0)
 	{
 		ScoreMultiplier = FMath::Clamp( (2*ScoreMultiplier) , 0, 8);
 	}
