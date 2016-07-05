@@ -6,6 +6,7 @@
 #include "Block.h"
 #include "Grid.h"
 #include "PaperSpriteComponent.h"
+#include "ScoreBox.h"
 
 DEFINE_LOG_CATEGORY(Possessor_log);
 // Sets default values
@@ -103,6 +104,7 @@ APossessor::APossessor()
 	ArrowMiniMultiplier = 0.1f;
 
 	TetrominoOnGridTimer = 0.0f;
+	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 500.0f);
 }
 
 void APossessor::BeginPlay()
@@ -488,7 +490,9 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 	Lines += RowsToDelete.Num();
 	//add up new score
 	if(bHasRowsToDelete){ CalculateMultiplier(); }
-	AddToScore( (CalculateRowDropScore(RowsToDelete) + CalculateTetroDropScore())*GetMultiplier() );
+	int tempScore = (CalculateRowDropScore(RowsToDelete) + CalculateTetroDropScore())*GetMultiplier();
+	if (tempScore != 0) { SpawnScoreBox(FString::FromInt(tempScore), ScoreBoxLocation); }
+	AddToScore(tempScore);
 	ChangeLevel();
 }
 
@@ -668,4 +672,10 @@ int APossessor::CalculateTetroDropScore()
 void APossessor::AddToScore(int score)
 {
 	Score += score;
+}
+
+void APossessor::SpawnScoreBox(FString score, FVector scoreBoxLocation)
+{
+	AScoreBox* newScore = GetWorld()->SpawnActor<AScoreBox>(AScoreBox::StaticClass());
+	newScore->SetScore(score,ScoreBoxLocation);
 }

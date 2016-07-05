@@ -189,4 +189,7 @@ public:
 	int CalculateRowDropScore(TArray<int8> rowsDeleted);
 	int CalculateTetroDropScore();
 	void AddToScore(int score);
+	void SpawnScoreBox(FString score,FVector scoreBoxLocation);
+	UPROPERTY(EditAnywhere, Category = "Game")
+	FVector ScoreBoxLocation;
 };
