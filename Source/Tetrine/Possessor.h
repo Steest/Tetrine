@@ -25,6 +25,8 @@ public:
 	// variables
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	FString NextTetromino;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	FString LandedTetromino;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game")
 	FString SavedTetromino;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")

@@ -57,6 +57,7 @@ APossessor::APossessor()
 
 	NextTetromino = "none";
 	SavedTetromino = "none";
+	LandedTetromino = "none";
 	FallTimeElapsed = 0.0f;
 	FastFallTimeElapsed = 0.0f;
 	HorizontalTimeElapsed = 0.0f;
@@ -136,6 +137,7 @@ void APossessor::Tick(float DeltaTime)
 			CurrentTetromino->SpawnShape(NextTetromino);
 			if (NextTetromino != "none") { CurrentTetromino->SpawnShape(NextTetromino); }
 			else { CurrentTetromino->SpawnShape(GenerateRandomTetromino()); }
+			LandedTetromino = NextTetromino;
 			NextTetromino = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
