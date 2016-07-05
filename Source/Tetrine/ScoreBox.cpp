@@ -104,7 +104,7 @@ void AScoreBox::UpdatePositions(float deltaTime)
 {
 	for (int i = 0; i < Score.Num(); ++i)
 	{
-		Score[i]->AddActorWorldOffset(FVector(0.0f, 0.0f, 300.0f*deltaTime));
+		Score[i]->AddActorWorldOffset(FVector(0.0f, 0.0f, 500.0f*deltaTime));
 		Score[i]->UpdateTransparency(1.0f - LifeTimeElapsed / LifeTimeLimit);
 	}
 }

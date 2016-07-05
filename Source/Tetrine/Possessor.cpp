@@ -56,7 +56,8 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinder<USoundBase> RotateSoundAsset(TEXT("SoundWave'/Game/SFX/Rotate1.Rotate1'"));
 	RotateSound->SetSound(RotateSoundAsset.Object);
 
-	NextTetromino = "none";
+	NextTetrominos.Add("none");
+	NextTetrominos.Add("none");
 	SavedTetromino = "none";
 	LandedTetromino = "none";
 	FallTimeElapsed = 0.0f;
@@ -97,14 +98,14 @@ APossessor::APossessor()
 	InitialLandedTL = LandedTimeLimit = 0.50f;
 	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.50f;
 	FastFallTimeLimit = 0.035f;
-	HorizontalTimeLimit = 0.175f;
+	HorizontalTimeLimit = 0.200f;
 	FastHorizTimeLimit = 0.0175f;
 	FallMultiplier = 0.050f;
 	LandedMultiplier = 0.025f;
 	ArrowMiniMultiplier = 0.1f;
 
 	TetrominoOnGridTimer = 0.0f;
-	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 500.0f);
+	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 2000.0f);
 }
 
 void APossessor::BeginPlay()
@@ -136,11 +137,20 @@ void APossessor::Tick(float DeltaTime)
 		if (CurrentTetromino == nullptr)
 		{
 			CurrentTetromino = SpawnTetromino();
-			CurrentTetromino->SpawnShape(NextTetromino);
-			if (NextTetromino != "none") { CurrentTetromino->SpawnShape(NextTetromino); }
-			else { CurrentTetromino->SpawnShape(GenerateRandomTetromino()); }
-			LandedTetromino = NextTetromino;
-			NextTetromino = GenerateRandomTetromino();
+			//CurrentTetromino->SpawnShape(NextTetromino[0]);
+			if (NextTetrominos[0] != "none") 
+			{ 
+				CurrentTetromino->SpawnShape(NextTetrominos[0]); 
+				NextTetrominos[0] = NextTetrominos[1];
+			}
+			else 
+			{ 
+				CurrentTetromino->SpawnShape(GenerateRandomTetromino()); 
+				NextTetrominos[0] = GenerateRandomTetromino();
+				
+			}
+		//	LandedTetromino = NextTetrominos[0];
+			NextTetrominos[1] = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
 			bHasChangedPositions = true;
@@ -187,7 +197,8 @@ void APossessor::Tick(float DeltaTime)
 		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 		OldGhostPositions = CurrentTetromino->GetPositions();
-		NextTetromino = GenerateRandomTetromino();
+		NextTetrominos[0] = GenerateRandomTetromino();
+		NextTetrominos[1] = GenerateRandomTetromino();
 		bHasMatchStarted = true;
 		bHasChangedPositions = true;
 	}
@@ -483,6 +494,7 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 {
 	TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
 	RowsToDelete = grid->GetExtraRows(RowsToDelete, extraRowsToDelete);
+	LandedTetromino = CurrentTetromino->Shape;
 	CurrentTetromino->EndLife(grid);
 	DeleteRows(RowsToDelete);
 	grid->DropRows();
@@ -587,7 +599,8 @@ void APossessor::SaveTetroReleased()
 
 void APossessor::SaveTetromino()
 {
-	NextTetromino = SavedTetromino;
+	NextTetrominos[0] = SavedTetromino;
+	NextTetrominos[1] = GenerateRandomTetromino();
 	SavedTetromino = CurrentTetromino->Shape;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -595,7 +608,6 @@ void APossessor::SaveTetromino()
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockSprite(0);
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetColor("empty");
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->ChangeColor(0);
-		UE_LOG(Possessor_log, Error, TEXT("Saved: i: %d"),i);
 		CurrentTetromino->blocks[i]->Destroy();
 		CurrentTetromino->blocks[i] = nullptr;
 	}
@@ -656,7 +668,6 @@ int APossessor::CalculateRowDropScore(TArray<int8> rowsDeleted)
 		else if (temp == 2) { temp = 200; }
 		else if (temp == 3) { temp = 250; }
 		else { temp = 300; }
-		UE_LOG(Possessor_log, Warning, TEXT("ROW DROP SCORE: %d"), temp);
 		result += temp;
 	}
 	return result;
@@ -665,7 +676,6 @@ int APossessor::CalculateRowDropScore(TArray<int8> rowsDeleted)
 int APossessor::CalculateTetroDropScore()
 {
 	int result = FMath::Clamp( int(((grid->GetHeight()/2) - TetrominoOnGridTimer) * 5),0,300);
-	UE_LOG(Possessor_log, Warning, TEXT("TETRO DROP SCORE: %d"),result );
 	return result;
 }
 
