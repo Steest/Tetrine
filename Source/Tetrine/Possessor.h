@@ -180,7 +180,7 @@ public:
 	// scoring system - might be placed into a separate actor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	int Score;
-	UPROPERTY(EditAnywhere, Category = "Game")
+	UPROPERTY(EditAnywhere,BluePrintReadWrite, Category = "Game")
 	int ScoreMultiplier;
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float TetrominoOnGridTimer;
