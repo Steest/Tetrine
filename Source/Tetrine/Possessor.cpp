@@ -173,7 +173,7 @@ void APossessor::Tick(float DeltaTime)
 		else 
 		{ 
 			if ((CurrentWrongTries >= MaxWrongTries || bIsArrowMiniFinished) && bIsRowDestroyAnimFin) { UpdateRowDeletion(); }
-			else if (!bIsArrowMiniFinished) { bIsArrowMiniFinished = UpdateArrowMiniGame(DeltaTime); bIsRowDestroyAnimFin = false; }
+			else if (!bIsArrowMiniFinished && CurrentWrongTries < MaxWrongTries) { bIsArrowMiniFinished = UpdateArrowMiniGame(DeltaTime); bIsRowDestroyAnimFin = false; }
 			else if (!bIsRowDestroyAnimFin) { bIsRowDestroyAnimFin = IsRowDeletionAnimFin(DeltaTime);  }
 			else { bIsArrowMiniFinished = bIsRowDestroyAnimFin = false; CurrentWrongTries = 0; }
 		}
@@ -701,16 +701,14 @@ void APossessor::UpdateRowDeletion()
 
 bool APossessor::IsRowDeletionAnimFin(float deltaTime)
 {
-	if (RowDestroyAnimTimeElapsed == 0.0f) { UE_LOG(Possessor_log, Error, TEXT("SETUP PROPERLY")); RowDestroyAnimTimeLimit = SetUpRowsDestroyAnim( grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()),ExtraRowsToDelete)); }
+	if (RowDestroyAnimTimeElapsed == 0.0f) { RowDestroyAnimTimeLimit = SetUpRowsDestroyAnim( grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()),ExtraRowsToDelete)); }
 	RowDestroyAnimTimeElapsed += deltaTime;
 	if (!HasReachedTimeLimit(RowDestroyAnimTimeElapsed, RowDestroyAnimTimeLimit)) 
 	{
-		UE_LOG(Possessor_log, Error, TEXT("HASNT REACHED ROW DELETION ANIM "));
 		return false;
 	}
 	else
 	{
-		UE_LOG(Possessor_log, Error, TEXT("HAS REACHED ROW DELETION ANIM "));
 		RowDestroyAnimTimeElapsed = 0.0f;
 		SetDownRowsDestroyAnim(grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()), ExtraRowsToDelete));
 		return true;
@@ -737,10 +735,8 @@ void APossessor::SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy)
 {
 	for (int i = 0; i < rowsToDestroy.Num(); ++i)
 	{
-		if (i >= grid->GetHeight() || rowsToDestroy[i] >= grid->GetHeight()) { UE_LOG(Possessor_log, Error, TEXT("SET DOWN ROW DESTROY ANIM EXCEEDED")); return; }
 		for (int j = 0; j < grid->GetWidth(); ++j)
 		{
-			if (j >= grid->GetWidth()) { UE_LOG(Possessor_log, Error, TEXT("SET DOWN ROW DESTROY ANIM EXCEEDED WIDTH")); return; }
 			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->SetFlipbook(BlockDestroyAnim, 1);
 			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->AddWorldOffset(FVector(0.0f, -10.0f, 0.0f));
 		}
