@@ -6,6 +6,7 @@
 #include "Block.h"
 #include "Grid.h"
 #include "PaperSpriteComponent.h"
+#include "PaperFlipbookComponent.h"
 #include "ScoreBox.h"
 
 DEFINE_LOG_CATEGORY(Possessor_log);
@@ -22,12 +23,14 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/Highlight2Arrow_Sprite.Highlight2Arrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightRowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ArrowSpriteAsset(TEXT("PaperSprite'/Game/Art/Arrow_Sprite.Arrow_Sprite'"));
-	
+	ConstructorHelpers::FObjectFinderOptional<UPaperFlipbook> BlockDestroyAnimAsset(TEXT("PaperFlipbook'/Game/Art/BlockDestroyAnimation/BlockDestroyAnim.BlockDestroyAnim'"));
+
 	GhostSprite = GhostSpriteAsset.Get();
 	HighlightArrowSprite = HighlightArrowAsset.Get();
 	HighlightRowSprite = HighlightRowAsset.Get();
 	ArrowSprite = ArrowSpriteAsset.Get();
-	
+	BlockDestroyAnim = BlockDestroyAnimAsset.Get();
+
 	TetrineTheme = CreateDefaultSubobject<UAudioComponent>(TEXT("TetrineTheme"));
 	ConstructorHelpers::FObjectFinder<USoundBase> TetrineThemeAsset(TEXT("SoundWave'/Game/SFX/TetrisTheme.TetrisTheme'"));
 	TetrineTheme->SetSound(TetrineThemeAsset.Object);
@@ -79,6 +82,7 @@ APossessor::APossessor()
 	bIsRotationKeyHeld = false;
 	bHasChangedPositions = true;
 	bhasSavedTetromino = false;
+	bIsRowDestroyAnimFin = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -98,12 +102,12 @@ APossessor::APossessor()
 	InitialLandedTL = LandedTimeLimit = 0.50f;
 	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.50f;
 	FastFallTimeLimit = 0.035f;
-	HorizontalTimeLimit = 0.200f;
-	FastHorizTimeLimit = 0.0175f;
+	HorizontalTimeLimit = 0.180f;
+	FastHorizTimeLimit = 0.015f;
 	FallMultiplier = 0.050f;
 	LandedMultiplier = 0.025f;
 	ArrowMiniMultiplier = 0.1f;
-
+	RowDestroyAnimTimeLimit = 0.75f;
 	TetrominoOnGridTimer = 0.0f;
 	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 2000.0f);
 }
@@ -168,17 +172,10 @@ void APossessor::Tick(float DeltaTime)
 		}
 		else 
 		{ 
-			if (CurrentWrongTries >= MaxWrongTries || !UpdateArrowMiniGame(DeltaTime)) 
-			{
-				StartDeletionProcess(ExtraRowsToDelete); 
-				bHasRowsToDelete = bHasTetrominoLanded = false; 
-				CurrentArrow = "none"; 
-				ArrowMiniTimeElapsed = TetrominoOnGridTimer = 0.0f;
-				ExtraRowsToDelete = CurrentWrongTries = 0;
-				grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
-				bIsGameOver = grid->IsBlockInDeadZone();
-				bhasSavedTetromino = false;
-			}
+			if ((CurrentWrongTries >= MaxWrongTries || bIsArrowMiniFinished) && bIsRowDestroyAnimFin) { UpdateRowDeletion(); }
+			else if (!bIsArrowMiniFinished) { bIsArrowMiniFinished = UpdateArrowMiniGame(DeltaTime); bIsRowDestroyAnimFin = false; }
+			else if (!bIsRowDestroyAnimFin) { bIsRowDestroyAnimFin = IsRowDeletionAnimFin(DeltaTime);  }
+			else { bIsArrowMiniFinished = bIsRowDestroyAnimFin = false; CurrentWrongTries = 0; }
 		}
 	}
 	else if (bIsGameOver)
@@ -525,7 +522,7 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 			{
 				ExtraRowsToDelete = 2;
 				AllCorrectSound->Play();
-				return false;
+				return true;
 			}
 			else { OneCorrectSound->Play(); }
 		}
@@ -537,10 +534,10 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 		}
 		bIsKeyProcessed = true;
 		CurrentArrow = "none";
-		return true;
+		return false;
 	}
 	ArrowMiniTimeElapsed = 0.0f;
-	return false; // false == finished mini game
+	return true; // false == finished mini game
 }
 
 void APossessor::CalculateArrowSequence()
@@ -688,4 +685,64 @@ void APossessor::SpawnScoreBox(FString score, FVector scoreBoxLocation)
 {
 	AScoreBox* newScore = GetWorld()->SpawnActor<AScoreBox>(AScoreBox::StaticClass());
 	newScore->SetScore(score,ScoreBoxLocation);
+}
+
+void APossessor::UpdateRowDeletion()
+{
+	StartDeletionProcess(ExtraRowsToDelete);
+	bHasRowsToDelete = bHasTetrominoLanded = false;
+	CurrentArrow = "none";
+	ArrowMiniTimeElapsed = TetrominoOnGridTimer = 0.0f;
+	ExtraRowsToDelete = CurrentWrongTries = 0;
+	grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
+	bIsGameOver = grid->IsBlockInDeadZone();
+	bIsRowDestroyAnimFin = bhasSavedTetromino = bIsArrowMiniFinished = false;
+}
+
+bool APossessor::IsRowDeletionAnimFin(float deltaTime)
+{
+	if (RowDestroyAnimTimeElapsed == 0.0f) { UE_LOG(Possessor_log, Error, TEXT("SETUP PROPERLY")); RowDestroyAnimTimeLimit = SetUpRowsDestroyAnim( grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()),ExtraRowsToDelete)); }
+	RowDestroyAnimTimeElapsed += deltaTime;
+	if (!HasReachedTimeLimit(RowDestroyAnimTimeElapsed, RowDestroyAnimTimeLimit)) 
+	{
+		UE_LOG(Possessor_log, Error, TEXT("HASNT REACHED ROW DELETION ANIM "));
+		return false;
+	}
+	else
+	{
+		UE_LOG(Possessor_log, Error, TEXT("HAS REACHED ROW DELETION ANIM "));
+		RowDestroyAnimTimeElapsed = 0.0f;
+		SetDownRowsDestroyAnim(grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()), ExtraRowsToDelete));
+		return true;
+	}
+}
+
+
+float APossessor::SetUpRowsDestroyAnim(TArray<int8> rowsToDestroy)
+{
+	for (int i = 0; i < rowsToDestroy.Num(); ++i)
+	{
+		for (int j = 0; j < grid->GetWidth(); ++j)
+		{
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->SetFlipbook(BlockDestroyAnim, 0);
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->AddWorldOffset(FVector(0.0f, 10.0f, 0.0f));
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->Stop();
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->Play();
+		}
+	}
+	return BlockDestroyAnim->GetTotalDuration(); 
+}
+
+void APossessor::SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy)
+{
+	for (int i = 0; i < rowsToDestroy.Num(); ++i)
+	{
+		if (i >= grid->GetHeight() || rowsToDestroy[i] >= grid->GetHeight()) { UE_LOG(Possessor_log, Error, TEXT("SET DOWN ROW DESTROY ANIM EXCEEDED")); return; }
+		for (int j = 0; j < grid->GetWidth(); ++j)
+		{
+			if (j >= grid->GetWidth()) { UE_LOG(Possessor_log, Error, TEXT("SET DOWN ROW DESTROY ANIM EXCEEDED WIDTH")); return; }
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->SetFlipbook(BlockDestroyAnim, 1);
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->AddWorldOffset(FVector(0.0f, -10.0f, 0.0f));
+		}
+	}
 }
