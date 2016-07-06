@@ -104,6 +104,7 @@ void AGrid::DeleteRow(int8 row)
 
 bool AGrid::ShouldDeleteRow(int8 row)
 {
+	if (row >= GetHeight()) { return false; }
 	for (int i = 0; i < GetWidth(); ++i)
 	{
 		if (matrix[i][row]->GetBlockStatus() == 0) { return false; }
@@ -190,7 +191,6 @@ bool AGrid::IsBlockInDeadZone()
 	{
 		for(int j = 0; j < GetWidth(); ++j)
 		{
-			UE_LOG(Grid_log, Error, TEXT("[%d][%d] status = %d"), j, i, GetBlock(FVector2D(j, i))->GetBlockStatus());
 			if(GetBlock(FVector2D(j,i))->GetBlockStatus() > 0) { return true; }
 		}
 	}
