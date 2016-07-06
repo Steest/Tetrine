@@ -36,7 +36,9 @@ AScoreBox::AScoreBox()
 	NineSprite = NineSpriteAsset.Get();
 
 	LifeTimeElapsed = 0.0f;
-	LifeTimeLimit = 0.75f;
+	LifeTimeLimit = 1.0f;
+	AnimateRate = 0.10f;
+	Rate = 0.10f;
 	Scale = 2.5f;
 }
 
@@ -51,6 +53,7 @@ void AScoreBox::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	LifeTimeElapsed += DeltaTime;
 	if (LifeTimeElapsed >= LifeTimeLimit) { DestroyAll(); }
+	else if (LifeTimeElapsed / LifeTimeLimit > AnimateRate) { AnimateScoreColor(); AnimateRate += Rate; }
 	else { UpdatePositions(DeltaTime); }
 }
 
@@ -127,4 +130,15 @@ void AScoreBox::RandomlyColorDigit(ADigit* digit)
 	else { newColor = FColor::FromHex("#FA32C8"); } // pink
 
 	digit->sprite->SetSpriteColor(newColor);
+}
+
+void AScoreBox::AnimateScoreColor()
+{
+	FLinearColor lastColor = Score[Score.Num() - 1]->sprite->GetSpriteColor();
+	UE_LOG(Scorebox_log, Error, TEXT("LENGTH IS: %d"), Score.Num());
+	for (int i = Score.Num()-1; i > 0; --i)
+	{
+		Score[i]->sprite->SetSpriteColor(Score[i - 1]->sprite->GetSpriteColor());
+	}
+	Score[0]->sprite->SetSpriteColor(lastColor);
 }

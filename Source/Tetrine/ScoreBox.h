@@ -36,6 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Score")
 	float Scale;
 	void SetScore(FString number,FVector scoreBoxLocation);
+	float AnimateRate;
+	float Rate;
 
 private:
 	
@@ -43,4 +45,5 @@ private:
 	class UPaperSprite* GetSprite(char character);
 	void UpdatePositions(float deltaTime);
 	void RandomlyColorDigit(class ADigit* digit);
+	void AnimateScoreColor();
 };
