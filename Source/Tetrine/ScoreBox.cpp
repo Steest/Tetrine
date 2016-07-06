@@ -11,19 +11,18 @@ AScoreBox::AScoreBox()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> PlusSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/plus_Sprite.plus_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ZeroSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/zero_Sprite.zero_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> OneSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/one_Sprite.one_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> TwoSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/two_Sprite.two_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ThreeSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/three_Sprite.three_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> FourSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/four_Sprite.four_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> FiveSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/five_Sprite.five_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> SixSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/six_Sprite.six_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> SevenSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/seven_Sprite.seven_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> EightSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/eight_Sprite.eight_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> NineSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/nine_Sprite.nine_Sprite'"));
-
-
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> PlusSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gplus_Sprite.gplus_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ZeroSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gzero_Sprite.gzero_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> OneSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gone_Sprite.gone_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> TwoSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gtwo_Sprite.gtwo_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ThreeSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gthree_Sprite.gthree_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> FourSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gfour_Sprite.gfour_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> FiveSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gfive_Sprite.gfive_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> SixSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gsix_Sprite.gsix_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> SevenSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gseven_Sprite.gseven_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> EightSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/geight_Sprite.geight_Sprite'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> NineSpriteAsset(TEXT("PaperSprite'/Game/Art/Digits/gnine_Sprite.gnine_Sprite'"));
+	
 	PlusSprite = PlusSpriteAsset.Get();
 	ZeroSprite = ZeroSpriteAsset.Get();
 	OneSprite = OneSpriteAsset.Get();
@@ -65,6 +64,7 @@ void AScoreBox::SetScore(FString number, FVector scoreBoxLocation)
 		Score[0]->SetSprite(PlusSprite);
 		Score[0]->AddActorWorldOffset(FVector(0.0f, 10.0f, 0.0f)+scoreBoxLocation);
 		Score[0]->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f)*Scale);
+		RandomlyColorDigit(Score[0]);
 	}
 
 	for (int i = 0; i < number.Len(); ++i)
@@ -73,7 +73,9 @@ void AScoreBox::SetScore(FString number, FVector scoreBoxLocation)
 		Score[i+1]->SetSprite(GetSprite(number[i]));
 		Score[i+1]->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f)*Scale);
 		Score[i+1]->AddActorWorldOffset(FVector( (i+1)*(Scale*(200.0f)) , 10.0f, 0.0f)+scoreBoxLocation);
+		RandomlyColorDigit(Score[i+1]);
 	}
+	LifeTimeElapsed = 0.0f;
 }
 
 void AScoreBox::DestroyAll()
@@ -108,4 +110,21 @@ void AScoreBox::UpdatePositions(float deltaTime)
 		Score[i]->AddActorWorldOffset(FVector(0.0f, 0.0f, 1000.0f*deltaTime));
 		Score[i]->UpdateTransparency(1.0f - LifeTimeElapsed / LifeTimeLimit);
 	}
+}
+
+void AScoreBox::RandomlyColorDigit(ADigit* digit)
+{
+	FColor newColor;
+	float randy = FMath::RandRange(0.0f, 1.0f); 
+	float percent = (1.0 / 7.0);
+
+	if (randy <= percent) { newColor = FColor::FromHex("#E14B32"); } //red
+	else if (randy <= percent*2) { newColor = FColor::FromHex("#3264E1"); } //blue
+	else if (randy <= percent*3) { newColor = FColor::FromHex("#19C819"); } //green
+	else if (randy <= percent*4) { newColor = FColor::FromHex("#FA9619"); } //orange
+	else if (randy <= percent*5) { newColor = FColor::FromHex("#E1E119"); } //yellow
+	else if (randy <= percent*6) { newColor = FColor::FromHex("#7D32FA"); }// purple
+	else { newColor = FColor::FromHex("#FA32C8"); } // pink
+
+	digit->sprite->SetSpriteColor(newColor);
 }

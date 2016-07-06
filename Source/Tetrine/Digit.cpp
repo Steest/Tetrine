@@ -33,7 +33,7 @@ void ADigit::SetSprite(UPaperSprite* s)
 
 void ADigit::UpdateTransparency(float transparencyAmount)
 {
-	FColor tempColor = FColor::White;
-	tempColor.A = uint8(transparencyAmount * 255);
+	FLinearColor tempColor = sprite->GetSpriteColor();
+	tempColor.A = transparencyAmount;
 	sprite->SetSpriteColor(tempColor);
 }

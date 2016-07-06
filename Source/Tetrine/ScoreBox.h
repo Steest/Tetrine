@@ -42,4 +42,5 @@ private:
 	void DestroyAll();
 	class UPaperSprite* GetSprite(char character);
 	void UpdatePositions(float deltaTime);
+	void RandomlyColorDigit(class ADigit* digit);
 };

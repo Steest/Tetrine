@@ -7,19 +7,22 @@ X - Add timer graphic that indicates time left for minigame
 X - Add saved block feature
 X - win/lose conditions
 - User interface
-  - redesign with cross design
+  - GAME BOY UI
+    - redesign with cross design on left
+    - stats on right
   - set the grid properly (screen resolution)
   - pause button toggle
 - sounds
   - redesign sounds
 - music
   - maybe get a new theme, or make one
-- scoring system
-  - add "+score" component to 
-  - tweak system to polish 
+X - scoring system
+  X - add "+score" component to 
+  X - tweak system to polish 
 - menu 
   - tighten it up a bit
-- Row drop animation
+X - Row drop animation
+    - polish it up
 - Add UI change to indicate in Arrow Mini Game
   - make the mini more clear as to what to do
   - tighten up the animations and art a bit
