@@ -59,6 +59,15 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinder<USoundBase> RotateSoundAsset(TEXT("SoundWave'/Game/SFX/Rotate1.Rotate1'"));
 	RotateSound->SetSound(RotateSoundAsset.Object);
 
+	TickSound = CreateDefaultSubobject<UAudioComponent>(TEXT("TickSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> TickSoundAsset(TEXT("SoundWave'/Game/SFX/tick1.tick1'"));
+	TickSound->SetSound(TickSoundAsset.Object);
+	
+	ExplosionSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSoundAsset(TEXT("SoundWave'/Game/SFX/Explosion1.Explosion1'"));
+	ExplosionSound->SetSound(ExplosionSoundAsset.Object);
+	
+
 	NextTetrominos.Add("none");
 	NextTetrominos.Add("none");
 	SavedTetromino = "none";
@@ -93,6 +102,7 @@ APossessor::APossessor()
 	Lines = 0;
 	Level = 1;
 	Score = 0;
+	TickedBlocksToColor = 0;
 	ScoreMultiplier = 1;
 
 	FinalFallTL = 0.05f;
@@ -109,7 +119,8 @@ APossessor::APossessor()
 	ArrowMiniMultiplier = 0.1f;
 	RowDestroyAnimTimeLimit = 0.75f;
 	TetrominoOnGridTimer = 0.0f;
-	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 2000.0f);
+	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 500.0f);
+	LevelUpgradeLocation = FVector(-2500.0f, 0.0f, 2000.0f);
 }
 
 void APossessor::BeginPlay()
@@ -129,6 +140,8 @@ void APossessor::BeginPlay()
 	AllWrongSound->Stop();
 	RotateSound->Stop();
 	TetrineTheme->Stop();
+	TickSound->Stop();
+	ExplosionSound->Stop();
 }
 
 void APossessor::Tick(float DeltaTime)
@@ -172,9 +185,9 @@ void APossessor::Tick(float DeltaTime)
 		}
 		else 
 		{ 
-			if ((CurrentWrongTries >= MaxWrongTries || bIsArrowMiniFinished) && bIsRowDestroyAnimFin) { UpdateRowDeletion(); }
+			if ((CurrentWrongTries >= MaxWrongTries || bIsArrowMiniFinished) && bIsRowDestroyAnimFin) { UpdateRowDeletion(); TickedBlocksToColor = 0; }
 			else if (!bIsArrowMiniFinished && CurrentWrongTries < MaxWrongTries) { bIsArrowMiniFinished = UpdateArrowMiniGame(DeltaTime); bIsRowDestroyAnimFin = false; }
-			else if (!bIsRowDestroyAnimFin) { bIsRowDestroyAnimFin = IsRowDeletionAnimFin(DeltaTime);  }
+			else if (!bIsRowDestroyAnimFin) { bIsRowDestroyAnimFin = IsRowDeletionAnimFin(DeltaTime); }
 			else { bIsArrowMiniFinished = bIsRowDestroyAnimFin = false; CurrentWrongTries = 0; }
 		}
 	}
@@ -578,9 +591,12 @@ void APossessor::MapTetrominoArrows()
 void APossessor::UpdateArrowMiniTimerBar()
 {
 	int blocksToColor = ArrowMiniTimeElapsed / ArrowMiniTimeLimit*10;
+	if (TickedBlocksToColor == blocksToColor) { return; }
+	TickedBlocksToColor = blocksToColor;
 	for (int i = 0; i < blocksToColor; ++i)
 	{
 		grid->GetBlock(FVector2D(i, ArrowSequencePosition.Y))->ChangeColor("pink");
+		TickSound->Play();
 	}
 }
 
@@ -623,10 +639,16 @@ void APossessor::SetLevel(int level)
 void APossessor::ChangeLevel()
 {
 	int level = (Score / 2500)+1;
-	SetLevel(level);
-	FallTimeLimit = FMath::Clamp(InitialFallTL - (level*FallMultiplier), FinalFallTL, InitialFallTL );
-	LandedTimeLimit = FMath::Clamp(InitialLandedTL - (level*LandedMultiplier), FinalLandedTL, InitialLandedTL);
-	ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), FinalArrowMiniTL, InitialArrowMiniTL );
+	if (level > GetLevel()) 
+	{ 
+		SetLevel(level);
+		FallTimeLimit = FMath::Clamp(InitialFallTL - (level*FallMultiplier), FinalFallTL, InitialFallTL);
+		LandedTimeLimit = FMath::Clamp(InitialLandedTL - (level*LandedMultiplier), FinalLandedTL, InitialLandedTL);
+		ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), FinalArrowMiniTL, InitialArrowMiniTL);
+		SpawnScoreBox("1", LevelUpgradeLocation);
+
+	}
+	
 }
 
 int APossessor::GetMultiplier()
@@ -684,7 +706,7 @@ void APossessor::AddToScore(int score)
 void APossessor::SpawnScoreBox(FString score, FVector scoreBoxLocation)
 {
 	AScoreBox* newScore = GetWorld()->SpawnActor<AScoreBox>(AScoreBox::StaticClass());
-	newScore->SetScore(score,ScoreBoxLocation);
+	newScore->SetScore(score, scoreBoxLocation);
 }
 
 void APossessor::UpdateRowDeletion()
@@ -711,6 +733,7 @@ bool APossessor::IsRowDeletionAnimFin(float deltaTime)
 	{
 		RowDestroyAnimTimeElapsed = 0.0f;
 		SetDownRowsDestroyAnim(grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()), ExtraRowsToDelete));
+		ExplosionSound->Play();
 		return true;
 	}
 }

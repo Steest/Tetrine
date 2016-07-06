@@ -59,6 +59,10 @@ public:
 	class UAudioComponent* AllWrongSound;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* RotateSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* TickSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* ExplosionSound;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;
 	UPROPERTY(EditAnywhere, Category = "Movement")
@@ -140,6 +144,7 @@ public:
 	float InitialLandedTL;
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float InitialArrowMiniTL;
+	int8 TickedBlocksToColor;
 
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
@@ -204,4 +209,6 @@ public:
 	void SpawnScoreBox(FString score,FVector scoreBoxLocation);
 	UPROPERTY(EditAnywhere, Category = "Game")
 	FVector ScoreBoxLocation;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	FVector LevelUpgradeLocation;
 };

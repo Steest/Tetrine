@@ -5,7 +5,7 @@
 #include "Digit.h"
 #include "PaperSpriteComponent.h"
 
-// Sets default values
+DEFINE_LOG_CATEGORY(Scorebox_log);
 AScoreBox::AScoreBox()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -60,9 +60,10 @@ void AScoreBox::SetScore(FString number, FVector scoreBoxLocation)
 {
 	if (Score.Num() == 0)
 	{
+		FVector temp = FVector(0.0f, 10.0f, 0.0f) + scoreBoxLocation;
 		Score.Add(GetWorld()->SpawnActor<ADigit>(ADigit::StaticClass()));
 		Score[0]->SetSprite(PlusSprite);
-		Score[0]->AddActorLocalOffset(FVector(0.0f, 10.0f, 0.0f)+scoreBoxLocation);
+		Score[0]->AddActorWorldOffset(FVector(0.0f, 10.0f, 0.0f)+scoreBoxLocation);
 		Score[0]->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f)*Scale);
 	}
 
@@ -71,7 +72,7 @@ void AScoreBox::SetScore(FString number, FVector scoreBoxLocation)
 		Score.Add(GetWorld()->SpawnActor<ADigit>(ADigit::StaticClass()));
 		Score[i+1]->SetSprite(GetSprite(number[i]));
 		Score[i+1]->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f)*Scale);
-		Score[i+1]->AddActorLocalOffset(FVector( (i+1)*(Scale*(200.0f)) , 10.0f, 0.0f)+scoreBoxLocation);
+		Score[i+1]->AddActorWorldOffset(FVector( (i+1)*(Scale*(200.0f)) , 10.0f, 0.0f)+scoreBoxLocation);
 	}
 }
 
@@ -104,7 +105,7 @@ void AScoreBox::UpdatePositions(float deltaTime)
 {
 	for (int i = 0; i < Score.Num(); ++i)
 	{
-		Score[i]->AddActorWorldOffset(FVector(0.0f, 0.0f, 500.0f*deltaTime));
+		Score[i]->AddActorWorldOffset(FVector(0.0f, 0.0f, 1000.0f*deltaTime));
 		Score[i]->UpdateTransparency(1.0f - LifeTimeElapsed / LifeTimeLimit);
 	}
 }

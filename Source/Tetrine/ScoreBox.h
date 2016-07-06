@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "ScoreBox.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(Scorebox_log, Log, All);
 UCLASS()
 class TETRINE_API AScoreBox : public AActor
 {
