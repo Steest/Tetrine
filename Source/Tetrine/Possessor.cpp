@@ -106,21 +106,21 @@ APossessor::APossessor()
 	ScoreMultiplier = 1;
 	
 	FinalFallTL = 0.05f;
-	FinalLandedTL = 0.2f;
+	FinalLandedTL = 0.5f;
 	FinalArrowMiniTL = 1.25f;
 	InitialFallTL = FallTimeLimit = 1.00f;
 	InitialLandedTL = LandedTimeLimit = 0.50f;
-	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.50f;
-	FastFallTimeLimit = 0.035f;
-	HorizontalTimeLimit = 0.180f;
+	InitialArrowMiniTL = ArrowMiniTimeLimit = 3.25f;
+	FastFallTimeLimit = 0.015f;
+	HorizontalTimeLimit = 0.08f;
 	FastHorizTimeLimit = 0.015f;
 	FallMultiplier = 0.050f;
 	LandedMultiplier = 0.025f;
 	ArrowMiniMultiplier = 0.1f;
 	RowDestroyAnimTimeLimit = 0.75f;
 	TetrominoOnGridTimer = 0.0f;
-	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 500.0f);
-	LevelUpgradeLocation = FVector(-2500.0f, 0.0f, 2000.0f);
+	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 3750.0f);
+	LevelUpgradeLocation = FVector(-2500.0f, 0.0f, 2750.0f);
 }
 
 void APossessor::BeginPlay()
@@ -546,6 +546,7 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 		return false;
 	}
 	ArrowMiniTimeElapsed = 0.0f;
+	CurrentWrongTries = 2;
 	return true; // false == finished mini game
 }
 
@@ -637,12 +638,11 @@ void APossessor::ChangeLevel()
 	int level = (Score / 2500)+1;
 	if (level > GetLevel()) 
 	{ 
-		SetLevel(level);
 		FallTimeLimit = FMath::Clamp(InitialFallTL - (level*FallMultiplier), FinalFallTL, InitialFallTL);
 		LandedTimeLimit = FMath::Clamp(InitialLandedTL - (level*LandedMultiplier), FinalLandedTL, InitialLandedTL);
 		ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), FinalArrowMiniTL, InitialArrowMiniTL);
-		SpawnScoreBox("1", LevelUpgradeLocation);
-
+		SpawnScoreBox( FString::FromInt(level-GetLevel()), LevelUpgradeLocation);
+		SetLevel(level);
 	}
 	
 }
