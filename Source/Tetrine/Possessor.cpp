@@ -67,6 +67,10 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinder<USoundBase> ExplosionSoundAsset(TEXT("SoundWave'/Game/SFX/Explosion1.Explosion1'"));
 	ExplosionSound->SetSound(ExplosionSoundAsset.Object);
 	
+	LevelUpSound = CreateDefaultSubobject<UAudioComponent>(TEXT("LevelUpSound"));
+	ConstructorHelpers::FObjectFinder<USoundBase> LevelUpSoundAsset(TEXT("SoundWave'/Game/SFX/LevelUp1.LevelUp1'"));
+	LevelUpSound->SetSound(LevelUpSoundAsset.Object);
+
 
 	NextTetrominos.Add("none");
 	NextTetrominos.Add("none");
@@ -142,6 +146,7 @@ void APossessor::BeginPlay()
 	TetrineTheme->Stop();
 	TickSound->Stop();
 	ExplosionSound->Stop();
+	LevelUpSound->Stop();
 }
 
 void APossessor::Tick(float DeltaTime)
@@ -643,6 +648,7 @@ void APossessor::ChangeLevel()
 		ArrowMiniTimeLimit = FMath::Clamp(InitialArrowMiniTL - (level*ArrowMiniMultiplier), FinalArrowMiniTL, InitialArrowMiniTL);
 		SpawnScoreBox( FString::FromInt(level-GetLevel()), LevelUpgradeLocation);
 		SetLevel(level);
+		LevelUpSound->Play();
 	}
 	
 }
