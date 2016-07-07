@@ -102,7 +102,7 @@ public:
 	bool bIsFastHorizontal;
 	bool bHasInitiatedHorizMove;
 	bool bIsFastFall;
-	UPROPERTY(VisibleAnywhere,Category="Game")
+	UPROPERTY(BlueprintReadWrite,VisibleAnywhere,Category="Game")
 	bool bHasTetrominoLanded;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	bool bHasMatchStarted;
@@ -118,11 +118,13 @@ public:
 	int Level;
 	bool bIsRotating;
 	bool bIsRotationKeyHeld;
+	//UPROPERTY(BlueprintReadWrite, Category = "Controls")
 	bool bIsInstantDropped;
 	bool bIsInstantDropKeyHeld;
 	bool bHasChangedPositions;
 	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
 	bool bIsRowDestroyAnimFin;
