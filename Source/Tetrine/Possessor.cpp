@@ -97,14 +97,14 @@ APossessor::APossessor()
 
 	RotationMatrix.Emplace(FVector2D(0, 1));
 	RotationMatrix.Emplace(FVector2D(-1, 0));
-	MaxWrongTries = 2;
+	MaxWrongTries = ExtraRowsToDelete = 2;
 	CurrentWrongTries = 0;
 	Lines = 0;
 	Level = 1;
 	Score = 0;
 	TickedBlocksToColor = 0;
 	ScoreMultiplier = 1;
-
+	
 	FinalFallTL = 0.05f;
 	FinalLandedTL = 0.2f;
 	FinalArrowMiniTL = 1.25f;
@@ -154,7 +154,6 @@ void APossessor::Tick(float DeltaTime)
 		if (CurrentTetromino == nullptr)
 		{
 			CurrentTetromino = SpawnTetromino();
-			//CurrentTetromino->SpawnShape(NextTetromino[0]);
 			if (NextTetrominos[0] != "none") 
 			{ 
 				CurrentTetromino->SpawnShape(NextTetrominos[0]); 
@@ -164,9 +163,7 @@ void APossessor::Tick(float DeltaTime)
 			{ 
 				CurrentTetromino->SpawnShape(GenerateRandomTetromino()); 
 				NextTetrominos[0] = GenerateRandomTetromino();
-				
 			}
-		//	LandedTetromino = NextTetrominos[0];
 			NextTetrominos[1] = GenerateRandomTetromino();
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
@@ -188,7 +185,7 @@ void APossessor::Tick(float DeltaTime)
 			if ((CurrentWrongTries >= MaxWrongTries || bIsArrowMiniFinished) && bIsRowDestroyAnimFin) { UpdateRowDeletion(); TickedBlocksToColor = 0; }
 			else if (!bIsArrowMiniFinished && CurrentWrongTries < MaxWrongTries) { bIsArrowMiniFinished = UpdateArrowMiniGame(DeltaTime); bIsRowDestroyAnimFin = false; }
 			else if (!bIsRowDestroyAnimFin) { bIsRowDestroyAnimFin = IsRowDeletionAnimFin(DeltaTime); }
-			else { bIsArrowMiniFinished = bIsRowDestroyAnimFin = false; CurrentWrongTries = 0; }
+			else { bIsArrowMiniFinished = bIsRowDestroyAnimFin = false;  }
 		}
 	}
 	else if (bIsGameOver)
@@ -533,7 +530,6 @@ bool APossessor::UpdateArrowMiniGame(float deltaTime)
 			
 			if (ArrowSequencePosition.X == ArrowSequence.Num())
 			{
-				ExtraRowsToDelete = 2;
 				AllCorrectSound->Play();
 				return true;
 			}
@@ -584,7 +580,7 @@ void APossessor::MapTetrominoArrows()
 		FVector2D tempPos = CurrentTetromino->blocks[i]->GetPosition();
 		grid->GetBlock(tempPos)->SetArrowDirection(CurrentTetromino->blocks[i]->GetArrowDirection());
 		grid->GetBlock(tempPos)->SetArrowVisibility(1);
-		CurrentTetromino->blocks[i]->AddActorLocalOffset(FVector(0.0f, -4.0f, 0.0f));
+		CurrentTetromino->blocks[i]->SetActorLocation(FVector(CurrentTetromino->blocks[i]->GetActorLocation().X, -50.0f, CurrentTetromino->blocks[i]->GetActorLocation().Z));
 	}
 }
 
@@ -711,11 +707,12 @@ void APossessor::SpawnScoreBox(FString score, FVector scoreBoxLocation)
 
 void APossessor::UpdateRowDeletion()
 {
-	StartDeletionProcess(ExtraRowsToDelete);
+	StartDeletionProcess( (ExtraRowsToDelete-CurrentWrongTries) );
+	UE_LOG(Possessor_log, Error, TEXT("Value of Row deletions is: %d"), ExtraRowsToDelete - CurrentWrongTries);
 	bHasRowsToDelete = bHasTetrominoLanded = false;
 	CurrentArrow = "none";
 	ArrowMiniTimeElapsed = TetrominoOnGridTimer = 0.0f;
-	ExtraRowsToDelete = CurrentWrongTries = 0;
+	CurrentWrongTries = 0;
 	grid->SetRowArrowSprite(ArrowSprite, ArrowSequencePosition.Y);
 	bIsGameOver = grid->IsBlockInDeadZone();
 	bIsRowDestroyAnimFin = bhasSavedTetromino = bIsArrowMiniFinished = false;
@@ -723,7 +720,7 @@ void APossessor::UpdateRowDeletion()
 
 bool APossessor::IsRowDeletionAnimFin(float deltaTime)
 {
-	if (RowDestroyAnimTimeElapsed == 0.0f) { RowDestroyAnimTimeLimit = SetUpRowsDestroyAnim( grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()),ExtraRowsToDelete)); }
+	if (RowDestroyAnimTimeElapsed == 0.0f) { RowDestroyAnimTimeLimit = SetUpRowsDestroyAnim( grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()),ExtraRowsToDelete-CurrentWrongTries)); }
 	RowDestroyAnimTimeElapsed += deltaTime;
 	if (!HasReachedTimeLimit(RowDestroyAnimTimeElapsed, RowDestroyAnimTimeLimit)) 
 	{
@@ -732,7 +729,8 @@ bool APossessor::IsRowDeletionAnimFin(float deltaTime)
 	else
 	{
 		RowDestroyAnimTimeElapsed = 0.0f;
-		SetDownRowsDestroyAnim(grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()), ExtraRowsToDelete));
+		SetDownRowsDestroyAnim(grid->GetExtraRows(FilterForDeletion(CurrentTetromino->GetTetrominoRows()), ExtraRowsToDelete-CurrentWrongTries));
+		UE_LOG(Possessor_log, Error, TEXT("IsRowDeletionAnim: %d"), ExtraRowsToDelete - CurrentWrongTries);
 		ExplosionSound->Play();
 		return true;
 	}

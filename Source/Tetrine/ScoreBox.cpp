@@ -135,7 +135,6 @@ void AScoreBox::RandomlyColorDigit(ADigit* digit)
 void AScoreBox::AnimateScoreColor()
 {
 	FLinearColor lastColor = Score[Score.Num() - 1]->sprite->GetSpriteColor();
-	UE_LOG(Scorebox_log, Error, TEXT("LENGTH IS: %d"), Score.Num());
 	for (int i = Score.Num()-1; i > 0; --i)
 	{
 		Score[i]->sprite->SetSpriteColor(Score[i - 1]->sprite->GetSpriteColor());
