@@ -43,9 +43,6 @@ void AGrid::GenerateMatrix(int scale)
 			tempBlock->SetActorLocation(FVector(i*tempBlock->GetDimensions().X, 0, j*tempBlock->GetDimensions().Y));
 			tempBlock->SetPosition(FVector2D(i, j));
 			tempBlock->SetBlockStatus(0);
-			//FString tempStr = "Block[" + FString::FromInt(i) + "][" + FString::FromInt(j) + "]";
-			//FName tempName = *tempStr;
-			//	tempBlock->Rename(*tempStr);
 			tempRow.Add(tempBlock);
 		}
 		matrix.Add(tempRow);
@@ -104,6 +101,7 @@ void AGrid::DeleteRow(int8 row)
 
 bool AGrid::ShouldDeleteRow(int8 row)
 {
+	if (row >= GetHeight()) { return false; }
 	for (int i = 0; i < GetWidth(); ++i)
 	{
 		if (matrix[i][row]->GetBlockStatus() == 0) { return false; }
@@ -157,7 +155,7 @@ TArray<int8> AGrid::GetExtraRows(const TArray<int8>& rowsToAvoid, int8 numOfRows
 	TArray<int8> extraRows = rowsToAvoid;
 	for (int i = 0; i < GetHeight() && numOfRows > 0; ++i)
 	{
-		if (!rowsToAvoid.Contains(i)) {	extraRows.Add(i); --numOfRows; }
+		if (!rowsToAvoid.Contains(i) && !IsRowEmpty(i)) {	extraRows.Add(i); --numOfRows; }
 	}
 	extraRows.Sort();
 	return extraRows;
@@ -190,7 +188,6 @@ bool AGrid::IsBlockInDeadZone()
 	{
 		for(int j = 0; j < GetWidth(); ++j)
 		{
-			UE_LOG(Grid_log, Error, TEXT("[%d][%d] status = %d"), j, i, GetBlock(FVector2D(j, i))->GetBlockStatus());
 			if(GetBlock(FVector2D(j,i))->GetBlockStatus() > 0) { return true; }
 		}
 	}

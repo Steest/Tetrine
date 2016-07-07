@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "ScoreBox.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(Scorebox_log, Log, All);
 UCLASS()
 class TETRINE_API AScoreBox : public AActor
 {
@@ -35,10 +36,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Score")
 	float Scale;
 	void SetScore(FString number,FVector scoreBoxLocation);
+	float AnimateRate;
+	float Rate;
 
 private:
 	
 	void DestroyAll();
 	class UPaperSprite* GetSprite(char character);
 	void UpdatePositions(float deltaTime);
+	void RandomlyColorDigit(class ADigit* digit);
+	void AnimateScoreColor();
 };

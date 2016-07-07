@@ -4,6 +4,7 @@
 #include "Block.h"
 #include "Grid.h"
 #include "PaperSpriteComponent.h"
+#include "PaperFlipbookComponent.h"
 
 ABlock::ABlock()
 {
@@ -26,6 +27,11 @@ ABlock::ABlock()
 	ArrowSprite->AttachTo(BlockHitBox);
 	ArrowSprite->SetVisibility(false);
 	ArrowSprite->AddWorldOffset(FVector(0.0f, 1.0f, 0.0f));
+
+	// anim destroy
+	BlockDestroyAnim = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("BlockDestroyAnim"));
+	BlockDestroyAnim->AttachTo(RootComponent);
+	BlockDestroyAnim->SetVisibility(false);
 
 	BlockStatus = 0;
 	Position.X = 0;
@@ -147,4 +153,17 @@ void ABlock::ChangeColor(int8 blockStatus)
 	if (blockStatus == 0) { ChangeColor("empty"); }
 	else if (blockStatus == 1 || blockStatus == 2) { ChangeColor("default"); }
 	else { ChangeColor("none"); }
+}
+
+void ABlock::SetFlipbook(UPaperFlipbook* anim, int8 blockStatus)
+{
+	if (blockStatus == 0)
+	{
+		BlockDestroyAnim->SetFlipbook(anim);
+		BlockDestroyAnim->SetVisibility(true);
+	}
+	else
+	{
+		BlockDestroyAnim->SetVisibility(false);
+	}
 }

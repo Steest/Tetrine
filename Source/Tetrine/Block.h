@@ -24,6 +24,8 @@ public:
 	class UPaperSprite* EmptySprite;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Anim")
 	class UPaperSprite* BlockSprite;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	class UPaperFlipbookComponent* BlockDestroyAnim;
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	int8 BlockStatus; // 0=empty,1=taken(static),2=taken(moving)
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
@@ -48,5 +50,5 @@ public:
 	FString GetColor();
 	void ChangeColor(FString color);
 	void ChangeColor(int8 blockStatus);
-
+	void SetFlipbook(class UPaperFlipbook* anim, int8 blockStatus);
 };

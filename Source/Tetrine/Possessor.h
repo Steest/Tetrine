@@ -43,6 +43,8 @@ public:
 	class UPaperSprite* HighlightRowSprite;
 	UPROPERTY(EditAnywhere, Category = "Anim")
 	class UPaperSprite* ArrowSprite;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	class UPaperFlipbook* BlockDestroyAnim;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* TetrineTheme;
 	UPROPERTY(EditAnywhere, Category = "Audio")
@@ -57,6 +59,10 @@ public:
 	class UAudioComponent* AllWrongSound;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* RotateSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* TickSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* ExplosionSound;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;
 	UPROPERTY(EditAnywhere, Category = "Movement")
@@ -83,6 +89,10 @@ public:
 	float ArrowMiniTimeLimit;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float ArrowMiniTimeElapsed;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	float RowDestroyAnimTimeElapsed;
+	UPROPERTY(EditAnywhere, Category = "Anim")
+	float RowDestroyAnimTimeLimit;
 	float PreviousHorizontalMove;
 	float CurrentHorizontalMove;
 	float PreviousVerticalMove;
@@ -113,6 +123,8 @@ public:
 	bool bIsKeyProcessed;
 	bool bhasSavedTetromino;
 	bool bIsSaveTetroKeyHeld;
+	bool bIsRowDestroyAnimFin;
+	bool bIsArrowMiniFinished;
 
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float FinalFallTL;
@@ -132,6 +144,7 @@ public:
 	float InitialLandedTL;
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float InitialArrowMiniTL;
+	int8 TickedBlocksToColor;
 
 	TArray<FVector2D> OldGhostPositions;
 	TArray<FVector2D> RotationMatrix;
@@ -176,6 +189,10 @@ public:
 	void ChangeLevel();
 	int GetMultiplier();
 	void CalculateMultiplier();
+	void UpdateRowDeletion();
+	bool IsRowDeletionAnimFin(float deltaTime);
+	float SetUpRowsDestroyAnim(TArray<int8> rowsToDestroy);
+	void SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy);
 
 	// scoring system - might be placed into a separate actor
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
@@ -192,4 +209,6 @@ public:
 	void SpawnScoreBox(FString score,FVector scoreBoxLocation);
 	UPROPERTY(EditAnywhere, Category = "Game")
 	FVector ScoreBoxLocation;
+	UPROPERTY(EditAnywhere, Category = "Game")
+	FVector LevelUpgradeLocation;
 };
