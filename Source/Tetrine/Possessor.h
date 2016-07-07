@@ -63,6 +63,8 @@ public:
 	class UAudioComponent* TickSound;
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	class UAudioComponent* ExplosionSound;
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	class UAudioComponent* LevelUpSound;
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	FString DebugString;
 	UPROPERTY(EditAnywhere, Category = "Movement")
