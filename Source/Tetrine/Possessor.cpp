@@ -347,7 +347,8 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 {
 	LandedTimeElapsed += deltaTime;
 	bool hasRowsToDelete = false;
-	if (HasReachedTimeLimit(LandedTimeElapsed, LandedTimeLimit))
+	bHasReachedTimeLimit = HasReachedTimeLimit(LandedTimeElapsed, LandedTimeLimit);
+	if (bHasReachedTimeLimit)
 	{
 		if (CurrentTetromino->DoesTetrominoCollide(FVector2D(0,-1),grid) == true)// block must be below in order to drop block																 
 		{   
