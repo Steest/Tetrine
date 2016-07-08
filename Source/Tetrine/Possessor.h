@@ -23,6 +23,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	// variables
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
+	bool bHasFinishedLandAnim;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	TArray<FString> NextTetrominos;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
@@ -102,8 +105,10 @@ public:
 	bool bIsFastHorizontal;
 	bool bHasInitiatedHorizMove;
 	bool bIsFastFall;
-	UPROPERTY(BlueprintReadWrite,VisibleAnywhere,Category="Game")
+	UPROPERTY(BlueprintReadWrite,VisibleAnywhere,Category = "Game")
 	bool bHasTetrominoLanded;
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
+	bool bHasReachedTimeLimit;
 	UPROPERTY(VisibleAnywhere, Category = "Game")
 	bool bHasMatchStarted;
 	UPROPERTY(BlueprintReadWrite,VisibleAnywhere, Category = "Game")
