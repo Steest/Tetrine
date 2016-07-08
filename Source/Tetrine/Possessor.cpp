@@ -125,17 +125,22 @@ APossessor::APossessor()
 	TetrominoOnGridTimer = 0.0f;
 	ScoreBoxLocation = FVector(-2500.0f, 0.0f, 3750.0f);
 	LevelUpgradeLocation = FVector(-2500.0f, 0.0f, 2750.0f);
-}
-
-void APossessor::BeginPlay()
-{
-	Super::BeginPlay();
 
 	MainCamera->SetWorldLocation(FVector(1000.0f, 7000.0f, 3000.0f));
 	MainCamera->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
 	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
 	MainCamera->SetOrthoWidth(15000.0f);
 	MainCamera->SetConstraintAspectRatio(true);
+	MainCamera->SetPostProcessBlendWeight(0.0f);
+	MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
+
+}
+
+void APossessor::BeginPlay()
+{
+	Super::BeginPlay();
+
+	
 
 	DropSound->Stop();
 	OneCorrectSound->Stop();
