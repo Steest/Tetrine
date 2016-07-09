@@ -273,7 +273,8 @@ void APossessor::UpdateFallElapsed(float deltaTime)
 	if (bIsFastFall)
 	{
 		FastFallTimeElapsed += deltaTime;
-		if (HasReachedTimeLimit(FastFallTimeElapsed, FastFallTimeLimit))
+		bHasReachedTimeLimit = HasReachedTimeLimit(FastFallTimeElapsed, FastFallTimeLimit);
+		if (bHasReachedTimeLimit)
 		{
 			FVector2D movement = FVector2D(0, -1);
 			if (CurrentTetromino->DoesTetrominoCollide(movement, grid) == false) // recall grid starts from bottom left and goes up right 
@@ -484,7 +485,7 @@ void APossessor::UpdateGhostTetromino()
 
 void APossessor::InstantDropPressed()
 {
-	if (!bIsInstantDropKeyHeld && !bIsInstantDropped) { bIsInstantDropped = true; }
+	if (!bIsInstantDropKeyHeld && !bIsInstantDropped) { bIsInstantDropped = true; LandedTetromino = CurrentTetromino->Shape;}
 	bIsInstantDropKeyHeld = true;
 }
 
@@ -512,7 +513,7 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 {
 	TArray<int8> RowsToDelete = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
 	RowsToDelete = grid->GetExtraRows(RowsToDelete, extraRowsToDelete);
-	LandedTetromino = CurrentTetromino->Shape;
+	//LandedTetromino = CurrentTetromino->Shape;
 	CurrentTetromino->EndLife(grid);
 	DeleteRows(RowsToDelete);
 	grid->DropRows();
