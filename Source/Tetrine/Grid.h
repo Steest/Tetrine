@@ -44,5 +44,5 @@ public:
 	bool IsBlockInDeadZone();
 	UFUNCTION(BlueprintCallable, Category = "Reset Grid")
 	void Clear();
-	void SetBlockCellSprite(class UPaperSprite* sprite, FVector2D position);
+	void SetBlockCellSprite(class UPaperSprite* sprite, FVector2D position );
 };

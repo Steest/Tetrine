@@ -201,7 +201,7 @@ void APossessor::Tick(float DeltaTime)
 	else if (bIsGameOver)
 	{
 		TetrineTheme->Stop();
-		grid->Clear();
+		//grid->Clear();
 	}
 	else
 	{
@@ -485,7 +485,7 @@ void APossessor::UpdateGhostTetromino()
 
 void APossessor::InstantDropPressed()
 {
-	if (!bIsInstantDropKeyHeld && !bIsInstantDropped) { bIsInstantDropped = true; LandedTetromino = CurrentTetromino->Shape;}
+	if (!bIsInstantDropKeyHeld && !bIsInstantDropped && !bIsGameOver) { bIsInstantDropped = true; LandedTetromino = CurrentTetromino->Shape;}
 	bIsInstantDropKeyHeld = true;
 }
 
