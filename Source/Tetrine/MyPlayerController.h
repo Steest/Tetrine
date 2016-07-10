@@ -15,8 +15,6 @@ class TETRINE_API AMyPlayerController : public APlayerController
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	//TSubclassOf<class UUserWidget> wSideBarDisplay;
-
-	//UPROPERTY()
 	//UUserWidget* MySideBarDisplay;
 
 	virtual void BeginPlay() override;

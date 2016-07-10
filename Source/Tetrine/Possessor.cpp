@@ -1,13 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Tetrine.h"
+
 #include "Possessor.h"
 #include "Tetromino.h"
 #include "Block.h"
 #include "Grid.h"
+#include "ScoreBox.h"
+
 #include "PaperSpriteComponent.h"
 #include "PaperFlipbookComponent.h"
-#include "ScoreBox.h"
 
 DEFINE_LOG_CATEGORY(Possessor_log);
 // Sets default values
@@ -140,8 +142,6 @@ void APossessor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-
 	DropSound->Stop();
 	OneCorrectSound->Stop();
 	AllCorrectSound->Stop();
@@ -270,41 +270,30 @@ bool APossessor::HasReachedTimeLimit(float &elapsed, float &timeLimit)
 
 void APossessor::UpdateFallElapsed(float deltaTime)
 {
+
 	if (bIsFastFall)
 	{
 		FastFallTimeElapsed += deltaTime;
 		bHasReachedTimeLimit = HasReachedTimeLimit(FastFallTimeElapsed, FastFallTimeLimit);
-		if (bHasReachedTimeLimit)
-		{
-			FVector2D movement = FVector2D(0, -1);
-			if (CurrentTetromino->DoesTetrominoCollide(movement, grid) == false) // recall grid starts from bottom left and goes up right 
-			{
-				CurrentTetromino->MoveTetrominoOnGrid(movement, grid);
-				LandedTimeElapsed = 0.0f;
-				bHasTetrominoLanded = false;
-			}
-			else // if block cant move down then we know it landed (were in fall update) so we start the timer for that
-			{
-				bHasTetrominoLanded = true;
-			}
-		}
 	}
 	else 
 	{
 		FallTimeElapsed += deltaTime;
-		if (HasReachedTimeLimit(FallTimeElapsed, FallTimeLimit))
+		bHasReachedTimeLimit = HasReachedTimeLimit(FallTimeElapsed, FallTimeLimit);
+	}
+
+	if (bHasReachedTimeLimit)
+	{
+		FVector2D movement = FVector2D(0, -1);
+		if (CurrentTetromino->DoesTetrominoCollide(movement, grid) == false) // recall grid starts from bottom left and goes up right 
 		{
-			FVector2D movement = FVector2D(0, -1);
-			if (CurrentTetromino->DoesTetrominoCollide(movement, grid) == false)
-			{
-				CurrentTetromino->MoveTetrominoOnGrid(movement, grid);
-				LandedTimeElapsed = 0.0f;
-				bHasTetrominoLanded = false;
-			}
-			else // if block cant move down then we know it landed (were in fall update) so we start the timer for that
-			{
-				bHasTetrominoLanded = true;
-			}
+			CurrentTetromino->MoveTetrominoOnGrid(movement, grid);
+			LandedTimeElapsed = 0.0f;
+			bHasTetrominoLanded = false;
+		}
+		else // if block cant move down then we know it landed (were in fall update) so we start the timer for that
+		{
+			bHasTetrominoLanded = true;
 		}
 	}
 }
