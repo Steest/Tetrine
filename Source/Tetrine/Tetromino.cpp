@@ -49,10 +49,14 @@ ABlock* ATetromino::SpawnBlock()
 	return GetWorld()->SpawnActor<ABlock>(ABlock::StaticClass());
 }
 
-void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bottom left to up right
-{ // must ensure that the 3rd block(block # 2 = 3 in 0 index)
+void ATetromino::SetShapeName(FString shape)
+{
 	Shape = shape;
-	if (shape == "square")
+}
+
+void ATetromino::SpawnShape() // recall that the grid goes from bottom left to up right
+{ // must ensure that the 3rd block(block # 2 = 3 in 0 index)
+	if (Shape == "square")
 	{
 		blocks[0]->SetPosition(FVector2D(4, 20));
 		blocks[1]->SetPosition(FVector2D(5, 20));
@@ -69,7 +73,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[2]->ChangeColor("red");
 		blocks[3]->ChangeColor("red");
 	}
-	else if (shape == "t")
+	else if (Shape == "t")
 	{
 		blocks[0]->SetPosition(FVector2D(4, 21));
 		blocks[1]->SetPosition(FVector2D(3, 20));
@@ -86,7 +90,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[2]->ChangeColor("blue");
 		blocks[3]->ChangeColor("blue");
 	}
-	else if (shape == "z")
+	else if (Shape == "z")
 	{
 		blocks[0]->SetPosition(FVector2D(3, 21));
 		blocks[1]->SetPosition(FVector2D(4, 20));
@@ -103,7 +107,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[2]->ChangeColor("green");
 		blocks[3]->ChangeColor("green");
 	}
-	else if (shape == "right bicep")
+	else if (Shape == "right bicep")
 	{
 		blocks[0]->SetPosition(FVector2D(5, 21));
 		blocks[1]->SetPosition(FVector2D(3, 20));
@@ -120,7 +124,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[2]->ChangeColor("yellow");
 		blocks[3]->ChangeColor("yellow");
 	}
-	else if (shape == "left bicep")
+	else if (Shape == "left bicep")
 	{
 		blocks[0]->SetPosition(FVector2D(3, 21));
 		blocks[1]->SetPosition(FVector2D(3, 20));
@@ -137,7 +141,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[2]->ChangeColor("pink");
 		blocks[3]->ChangeColor("pink");
 	}
-	else if (shape == "flat")
+	else if (Shape == "flat")
 	{
 		blocks[0]->SetPosition(FVector2D(3, 21));
 		blocks[1]->SetPosition(FVector2D(4, 21)); 
@@ -154,7 +158,7 @@ void ATetromino::SpawnShape(FString shape) // recall that the grid goes from bot
 		blocks[2]->ChangeColor("purple");
 		blocks[3]->ChangeColor("purple");
 	}
-	else if (shape == "s")
+	else if (Shape == "s")
 	{
 		blocks[0]->SetPosition(FVector2D(5, 21));
 		blocks[1]->SetPosition(FVector2D(3, 20));

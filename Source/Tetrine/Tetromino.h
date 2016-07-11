@@ -27,7 +27,8 @@ public:
 	// methods
 	void EndLife(class AGrid* grid);
 	class ABlock* SpawnBlock();
-	void SpawnShape(FString shape);
+	void SetShapeName(FString shape);
+	void SpawnShape();
 	bool DoesTetrominoCollide(FVector2D movement, class AGrid* grid);
 	void MoveTetrominoOnGrid(FVector2D movement, class AGrid* grid);
 	void SetArrowsVisibility(int8 blockStatus);

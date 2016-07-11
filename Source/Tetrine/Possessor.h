@@ -25,6 +25,8 @@ public:
 	// variables
 	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	bool bHasFinishedLandAnim;
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
+	bool bHasStartedLandAnim;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	TArray<FString> NextTetrominos;
@@ -32,6 +34,8 @@ public:
 	FString LandedTetromino;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game")
 	FString SavedTetromino;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Game")
+	FString CurrentTetrominoName;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Game")
 	class ATetromino* CurrentTetromino;
 	UPROPERTY(EditAnywhere, Category = "Grid")

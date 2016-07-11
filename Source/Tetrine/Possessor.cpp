@@ -170,12 +170,16 @@ void APossessor::Tick(float DeltaTime)
 			CurrentTetromino = SpawnTetromino();
 			if (NextTetrominos[0] != "none") 
 			{ 
-				CurrentTetromino->SpawnShape(NextTetrominos[0]); 
+				CurrentTetromino->SetShapeName(NextTetrominos[0]);
+				CurrentTetromino->SpawnShape();
+				CurrentTetrominoName = CurrentTetromino->Shape;
 				NextTetrominos[0] = NextTetrominos[1];
 			}
 			else 
 			{ 
-				CurrentTetromino->SpawnShape(GenerateRandomTetromino()); 
+				CurrentTetromino->SetShapeName(GenerateRandomTetromino());
+				CurrentTetromino->SpawnShape();
+				CurrentTetrominoName = CurrentTetromino->Shape;
 				NextTetrominos[0] = GenerateRandomTetromino();
 			}
 			NextTetrominos[1] = GenerateRandomTetromino();
@@ -183,13 +187,17 @@ void APossessor::Tick(float DeltaTime)
 			bHasTetrominoLanded = false;
 			bHasChangedPositions = true;
 		}
+		//if (bHasFinishedLandAnim)
+		//{
+		//	CurrentTetrominoName = CurrentTetromino->Shape;
+		//}
 		if (!bHasRowsToDelete)
 		{
 			TetrominoOnGridTimer += DeltaTime;
 			if (bIsSaveTetroKeyHeld && !bhasSavedTetromino) { SaveTetromino(); CurrentTetromino->Destroy(); CurrentTetromino = nullptr; bhasSavedTetromino = true; return; }
 			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
 			UpdateFallElapsed(DeltaTime);
-			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; LandedTimeElapsed = LandedTimeLimit; }
+			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; bHasStartedLandAnim = true; LandedTimeElapsed = LandedTimeLimit; }
 			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
 			if (bHasChangedPositions) { UpdateGhostTetromino(); }
 			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = true; CalculateArrowSequence(); bIsKeyProcessed = true; }
@@ -215,9 +223,11 @@ void APossessor::Tick(float DeltaTime)
 
 		CurrentTetromino = SpawnTetromino();
 		if (CurrentTetromino == nullptr) { UE_LOG(Possessor_log, Error, TEXT("Tetro2 == nullptr")); return; }
-		CurrentTetromino->SpawnShape(GenerateRandomTetromino());
+		CurrentTetromino->SetShapeName(GenerateRandomTetromino());
+		CurrentTetromino->SpawnShape();
 		CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 		OldGhostPositions = CurrentTetromino->GetPositions();
+		CurrentTetrominoName = CurrentTetromino->Shape;
 		NextTetrominos[0] = GenerateRandomTetromino();
 		NextTetrominos[1] = GenerateRandomTetromino();
 		bHasMatchStarted = true;
@@ -357,6 +367,7 @@ bool APossessor::UpdateLandedElapsed(float deltaTime)
 			}
 			else
 			{
+				LandedTetromino = CurrentTetromino->Shape;
 				StartDeletionProcess(0);
 				LandedTimeElapsed = 0.0f;
 				bHasTetrominoLanded = false;
@@ -478,7 +489,7 @@ void APossessor::UpdateGhostTetromino()
 
 void APossessor::InstantDropPressed()
 {
-	if (!bIsInstantDropKeyHeld && !bIsInstantDropped && !bIsGameOver) { bIsInstantDropped = true; LandedTetromino = CurrentTetromino->Shape;}
+	if (!bIsInstantDropKeyHeld && !bIsInstantDropped) { bIsInstantDropped = true;}
 	bIsInstantDropKeyHeld = true;
 }
 
@@ -616,7 +627,7 @@ void APossessor::SaveTetromino()
 {
 	NextTetrominos[0] = SavedTetromino;
 	NextTetrominos[1] = GenerateRandomTetromino();
-	SavedTetromino = CurrentTetromino->Shape;
+	SavedTetromino = CurrentTetrominoName;
 	for (int i = 0; i < 4; ++i)
 	{
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockStatus(0);
