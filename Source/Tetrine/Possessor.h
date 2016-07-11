@@ -13,9 +13,9 @@ class TETRINE_API APossessor : public APawn
 
 public:
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-	//TSubclassOf<class UUserWidget> wSideBarDisplay;
-	//UUserWidget* MySideBarDisplay;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wSideBarDisplay;
+	UUserWidget* MySideBarDisplay;
 
 	APossessor();
 	virtual void BeginPlay() override;
@@ -126,12 +126,14 @@ public:
 	bool bIsRotationKeyHeld;
 	UPROPERTY(BlueprintReadWrite, Category = "Controls")
 	bool bIsInstantDropped;
+	UPROPERTY(BlueprintReadWrite, Category = "Controls")
 	bool bIsInstantDropKeyHeld;
 	bool bHasChangedPositions;
 	bool bHasRowsToDelete;
 	bool bIsKeyProcessed;
-	UPROPERTY(BlueprintReadWrite, Category = "Game")
+	UPROPERTY(BlueprintReadWrite, Category = "Controls")
 	bool bhasSavedTetromino;
+	UPROPERTY(BlueprintReadWrite, Category = "Controls")
 	bool bIsSaveTetroKeyHeld;
 	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	bool bIsRowDestroyAnimFin;

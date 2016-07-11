@@ -10,6 +10,7 @@
 
 #include "PaperSpriteComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "Blueprint/UserWidget.h"
 
 DEFINE_LOG_CATEGORY(Possessor_log);
 // Sets default values
@@ -141,6 +142,9 @@ APossessor::APossessor()
 void APossessor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//create widget reference.
+
 
 	DropSound->Stop();
 	OneCorrectSound->Stop();
