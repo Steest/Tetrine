@@ -142,6 +142,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	bool bIsRowDestroyAnimFin;
 	bool bIsArrowMiniFinished;
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	bool bStartUIAnimation;
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	bool bStartUILandedAnim;
 
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float FinalFallTL;

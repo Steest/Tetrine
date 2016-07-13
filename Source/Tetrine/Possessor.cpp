@@ -99,6 +99,8 @@ APossessor::APossessor()
 	bHasChangedPositions = true;
 	bhasSavedTetromino = false;
 	bIsRowDestroyAnimFin = false;
+	bStartUIAnimation = false;
+	bStartUILandedAnim = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -186,6 +188,7 @@ void APossessor::Tick(float DeltaTime)
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
 			bHasChangedPositions = true;
+			if (bIsInstantDropped) { bIsInstantDropped = false; bStartUIAnimation = bStartUILandedAnim = true; }
 		}
 		//if (bHasFinishedLandAnim)
 		//{
@@ -197,7 +200,7 @@ void APossessor::Tick(float DeltaTime)
 			if (bIsSaveTetroKeyHeld && !bhasSavedTetromino) { SaveTetromino(); CurrentTetromino->Destroy(); CurrentTetromino = nullptr; bhasSavedTetromino = true; return; }
 			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
 			UpdateFallElapsed(DeltaTime);
-			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true; bIsInstantDropped = false; bHasStartedLandAnim = true; LandedTimeElapsed = LandedTimeLimit; }
+			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true;  bHasStartedLandAnim = true; LandedTimeElapsed = LandedTimeLimit; }
 			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
 			if (bHasChangedPositions) { UpdateGhostTetromino(); }
 			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = true; CalculateArrowSequence(); bIsKeyProcessed = true; }
