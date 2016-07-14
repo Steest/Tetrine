@@ -134,13 +134,13 @@ void ABlock::ChangeColor(FString color)
 	FColor newColor;
 	if (color == "default" || color == "") { color = GetColor(); }
 
-	if (color == "red") { newColor = FColor::FromHex("#E14B32"); }
-	else if (color == "blue") { newColor = FColor::FromHex("#3264E1"); }
-	else if (color == "green") { newColor = FColor::FromHex("#19C819"); }
-	else if (color == "orange") { newColor = FColor::FromHex("#FA9619"); }
-	else if (color == "yellow") { newColor = FColor::FromHex("#E1E119"); }
-	else if (color == "purple") { newColor = FColor::FromHex("#7D32FA"); }
-	else if (color == "pink") { newColor = FColor::FromHex("#FA32C8"); }
+	if (color == "red") { newColor = FColor::FromHex("#E14B32"); } // square
+	else if (color == "blue") { newColor = FColor::FromHex("#3264E1"); } // t
+	else if (color == "green") { newColor = FColor::FromHex("#19C819"); } // z
+	else if (color == "orange") { newColor = FColor::FromHex("#FA9619"); } // s
+	else if (color == "yellow") { newColor = FColor::FromHex("#E1E119"); } // right bicep
+	else if (color == "purple") { newColor = FColor::FromHex("#7D32FA"); } // flat
+	else if (color == "pink") { newColor = FColor::FromHex("#FA32C8"); } // left bicep
 	else if (color == "grey" || color == "white" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
 	else if (color == "black") { newColor = FColor::FromHex("#000000"); }
 	else { newColor = FColor::FromHex("#32E1FA"); } // turqouise-ish

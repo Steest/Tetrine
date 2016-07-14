@@ -146,6 +146,8 @@ public:
 	bool bStartUIAnimation;
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	bool bStartUILandedAnim;
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	bool bStartUISavedAnim;
 
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float FinalFallTL;

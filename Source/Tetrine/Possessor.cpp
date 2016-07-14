@@ -101,6 +101,7 @@ APossessor::APossessor()
 	bIsRowDestroyAnimFin = false;
 	bStartUIAnimation = false;
 	bStartUILandedAnim = false;
+	bStartUISavedAnim = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -188,7 +189,7 @@ void APossessor::Tick(float DeltaTime)
 			CurrentTetromino->MoveTetrominoOnGrid(FVector2D(0, 0), grid);
 			bHasTetrominoLanded = false;
 			bHasChangedPositions = true;
-			if (bIsInstantDropped) { bIsInstantDropped = false; bStartUIAnimation = bStartUILandedAnim = true; }
+			if (bStartUILandedAnim || bStartUISavedAnim) { bStartUIAnimation = true; }
 		}
 		//if (bHasFinishedLandAnim)
 		//{
@@ -197,13 +198,13 @@ void APossessor::Tick(float DeltaTime)
 		if (!bHasRowsToDelete)
 		{
 			TetrominoOnGridTimer += DeltaTime;
-			if (bIsSaveTetroKeyHeld && !bhasSavedTetromino) { SaveTetromino(); CurrentTetromino->Destroy(); CurrentTetromino = nullptr; bhasSavedTetromino = true; return; }
+			if (bIsSaveTetroKeyHeld && !bhasSavedTetromino) { SaveTetromino(); CurrentTetromino->Destroy(); CurrentTetromino = nullptr; bhasSavedTetromino = bStartUISavedAnim = true; return; }
 			if (CurrentHorizontalMove != 0.0f) { UpdateHorizontalElapsed(DeltaTime);  bHasChangedPositions = true; }
 			UpdateFallElapsed(DeltaTime);
-			if (bIsInstantDropped) { InstantDrop(); bHasTetrominoLanded = true;  bHasStartedLandAnim = true; LandedTimeElapsed = LandedTimeLimit; }
+			if (bIsInstantDropped) { InstantDrop(); bIsInstantDropped = false; bHasTetrominoLanded = bHasStartedLandAnim = true; LandedTimeElapsed = LandedTimeLimit; }
 			if (bIsRotating) { UpdateRotations(); bHasChangedPositions = true; }
 			if (bHasChangedPositions) { UpdateGhostTetromino(); }
-			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = true; CalculateArrowSequence(); bIsKeyProcessed = true; }
+			if (bHasTetrominoLanded && UpdateLandedElapsed(DeltaTime)) { bHasRowsToDelete = bStartUILandedAnim = bIsKeyProcessed = true; CalculateArrowSequence(); }
 		}
 		else 
 		{ 
@@ -532,6 +533,7 @@ void APossessor::StartDeletionProcess(int8 extraRowsToDelete)
 	if (tempScore != 0) { SpawnScoreBox(FString::FromInt(tempScore), ScoreBoxLocation); }
 	AddToScore(tempScore);
 	ChangeLevel();
+	bStartUILandedAnim = true;
 }
 
 bool APossessor::UpdateArrowMiniGame(float deltaTime)
