@@ -137,8 +137,8 @@ APossessor::APossessor()
 	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
 	MainCamera->SetOrthoWidth(15000.0f);
 	MainCamera->SetConstraintAspectRatio(true);
-	MainCamera->SetPostProcessBlendWeight(0.0f);
-	MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
+	//MainCamera->SetPostProcessBlendWeight(0.0f);
+	//MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
 
 }
 
@@ -508,6 +508,8 @@ void APossessor::InstantDrop()
 	{
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockStatus(0);
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockSprite(0);
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->ChangeColor(0);
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->BlockHitBox->SetMobility(EComponentMobility::Stationary);
 	
 		grid->GetBlock(OldGhostPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(OldGhostPositions[i])->SetBlockSprite(2);
