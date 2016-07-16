@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Block.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(MyLog, Log, All);
 UCLASS()
 class TETRINE_API ABlock : public AActor
 {
@@ -33,7 +34,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stats")
 	FString ArrowDirection;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
-	FString Color; 
+	FString Color;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	FLinearColor RenderedColor;
 
 	// methods
 	bool DoesBlockCollide(FVector2D movement, class AGrid* grid);
@@ -50,5 +53,6 @@ public:
 	FString GetColor();
 	void ChangeColor(FString color);
 	void ChangeColor(int8 blockStatus);
+	void ChangeColorByShape(FString shape);
 	void SetFlipbook(class UPaperFlipbook* anim, int8 blockStatus);
 };

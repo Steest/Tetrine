@@ -6,6 +6,7 @@
 #include "PaperSpriteComponent.h"
 #include "PaperFlipbookComponent.h"
 
+DEFINE_LOG_CATEGORY(MyLog);
 ABlock::ABlock()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -144,8 +145,9 @@ void ABlock::ChangeColor(FString color)
 	else if (color == "grey" || color == "white" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
 	else if (color == "black") { newColor = FColor::FromHex("#000000"); }
 	else { newColor = FColor::FromHex("#32E1FA"); } // turqouise-ish
-
-	BlockHitBox->SetSpriteColor(newColor);
+	//UE_LOG(MyLog, All,TEXT("My color is %s"),*newColor.ToString());
+	RenderedColor = FLinearColor(newColor);
+	BlockHitBox->SetSpriteColor(RenderedColor);
 }
 
 void ABlock::ChangeColor(int8 blockStatus)
@@ -153,6 +155,22 @@ void ABlock::ChangeColor(int8 blockStatus)
 	if (blockStatus == 0) { ChangeColor("empty"); }
 	else if (blockStatus == 1 || blockStatus == 2) { ChangeColor("default"); }
 	else { ChangeColor("none"); }
+}
+
+void ABlock::ChangeColorByShape(FString shapeName)
+{
+	FColor newColor;
+	if (shapeName == "square") { newColor = FColor::FromHex("#E14B32"); } // red
+	else if (shapeName == "t") { newColor = FColor::FromHex("#3264E1"); } // blue
+	else if (shapeName == "z") { newColor = FColor::FromHex("#19C819"); } // green
+	else if (shapeName == "s") { newColor = FColor::FromHex("#FA9619"); } // orange
+	else if (shapeName == "right bicep") { newColor = FColor::FromHex("#E1E119"); } // yellow
+	else if (shapeName == "flat") { newColor = FColor::FromHex("#7D32FA"); } // purple
+	else if (shapeName == "left bicep") { newColor = FColor::FromHex("#FA32C8"); } // pink
+	else { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
+
+	RenderedColor = FLinearColor(newColor);
+	BlockHitBox->SetSpriteColor(RenderedColor);
 }
 
 void ABlock::SetFlipbook(UPaperFlipbook* anim, int8 blockStatus)

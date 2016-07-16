@@ -197,6 +197,8 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 		FVector2D oldPosition = blocks[i]->GetPosition();
 		grid->GetBlock(oldPosition)->SetBlockStatus(0); // remember grid has matrix, and tetromino has separate set of blocks
 		grid->GetBlock(oldPosition)->SetBlockSprite(0);
+		grid->GetBlock(oldPosition)->ChangeColor(0);
+		grid->GetBlock(oldPosition)->BlockHitBox->SetMobility(EComponentMobility::Stationary);
 	}
 
 	for (int i = 0; i < 4; ++i) // then add new blocks
@@ -205,8 +207,10 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 		blocks[i]->SetPosition(newPosition); // tetromino has right position now
 		grid->GetBlock(newPosition)->SetBlockStatus(2); //grid has right collision matrix now
 		grid->GetBlock(newPosition)->SetBlockSprite(2);
+		grid->GetBlock(newPosition)->BlockHitBox->SetMobility(EComponentMobility::Movable);
+		grid->GetBlock(newPosition)->ChangeColorByShape(Shape);
 
-		FVector newLocation = blocks[i]->GetDimensions().X*FVector(blocks[i]->GetPosition().X, 1, blocks[i]->GetPosition().Y);
+		FVector newLocation = blocks[i]->GetDimensions().X*FVector(blocks[i]->GetPosition().X, grid->GetActorLocation().Y, blocks[i]->GetPosition().Y);
 		blocks[i]->SetActorLocation(newLocation);
 	}
 }
@@ -319,12 +323,15 @@ void ATetromino::ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid)
 		FVector2D oldPosition = blocks[i]->GetPosition();
 		grid->GetBlock(oldPosition)->SetBlockStatus(0); // remember grid has matrix, and tetromino has separate set of blocks
 		grid->GetBlock(oldPosition)->SetBlockSprite(0);
+		grid->GetBlock(oldPosition)->ChangeColor(0);
 	}
 
 	for (int i = 0; i < 4; ++i) // delete this and merge with up loop
 	{
 		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
+		grid->GetBlock(newPositions[i])->ChangeColorByShape(Shape);
+		//grid->GetBlock(newPositions[i])->BlockHitBox->SetSpriteColor(FLinearColor::Blue);
 		blocks[i]->SetPosition(newPositions[i]);
 
 		FVector rotatedPosition = blocks[i]->GetDimensions().X * FVector(newPositions[i].X, 1, newPositions[i].Y);
