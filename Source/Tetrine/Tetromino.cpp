@@ -199,9 +199,9 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 		grid->GetBlock(oldPosition)->SetBlockSprite(0);
 		grid->GetBlock(oldPosition)->ChangeColor(0);
 		grid->GetBlock(oldPosition)->BlockHitBox->SetMobility(EComponentMobility::Stationary);
+		grid->GetBlock(oldPosition)->SetArrowVisibility(0);
 	}
-
-	for (int i = 0; i < 4; ++i) // then add new blocks
+	for (int i = 0; i < 4; ++i)
 	{
 		FVector2D newPosition = blocks[i]->GetPosition() + movement;
 		blocks[i]->SetPosition(newPosition); // tetromino has right position now
@@ -209,6 +209,8 @@ void ATetromino::MoveTetrominoOnGrid(FVector2D movement, AGrid* grid)
 		grid->GetBlock(newPosition)->SetBlockSprite(2);
 		grid->GetBlock(newPosition)->BlockHitBox->SetMobility(EComponentMobility::Movable);
 		grid->GetBlock(newPosition)->ChangeColorByShape(Shape);
+		grid->GetBlock(newPosition)->SetArrowDirection(blocks[i]->GetArrowDirection());
+		grid->GetBlock(newPosition)->SetArrowVisibility(2);
 
 		FVector newLocation = blocks[i]->GetDimensions().X*FVector(blocks[i]->GetPosition().X, grid->GetActorLocation().Y, blocks[i]->GetPosition().Y);
 		blocks[i]->SetActorLocation(newLocation);
@@ -318,18 +320,24 @@ bool ATetromino::CanShiftPositions(const TArray<FVector2D> &newPositions, AGrid*
 
 void ATetromino::ApplyRotation(TArray<FVector2D> newPositions,AGrid* grid)
 {
+	TArray<FString> ArrowDirections;
 	for (int i = 0; i < 4; ++i) // remove old block image
 	{
 		FVector2D oldPosition = blocks[i]->GetPosition();
 		grid->GetBlock(oldPosition)->SetBlockStatus(0); // remember grid has matrix, and tetromino has separate set of blocks
 		grid->GetBlock(oldPosition)->SetBlockSprite(0);
 		grid->GetBlock(oldPosition)->ChangeColor(0);
+		grid->GetBlock(oldPosition)->SetArrowVisibility(0);
+		ArrowDirections.Add(grid->GetBlock(oldPosition)->GetArrowDirection());
 	}
 
-	for (int i = 0; i < 4; ++i) // delete this and merge with up loop
+	for (int i = 0; i < 4; ++i) // add new image
 	{
 		grid->GetBlock(newPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(newPositions[i])->SetBlockSprite(2);
+		grid->GetBlock(newPositions[i])->SetArrowVisibility(2);
+		grid->GetBlock(newPositions[i])->SetArrowDirection(ArrowDirections[i]);
+
 		grid->GetBlock(newPositions[i])->ChangeColorByShape(Shape);
 		//grid->GetBlock(newPositions[i])->BlockHitBox->SetSpriteColor(FLinearColor::Blue);
 		blocks[i]->SetPosition(newPositions[i]);

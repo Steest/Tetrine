@@ -137,8 +137,8 @@ APossessor::APossessor()
 	MainCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
 	MainCamera->SetOrthoWidth(15000.0f);
 	MainCamera->SetConstraintAspectRatio(true);
-	//MainCamera->SetPostProcessBlendWeight(0.0f);
-	//MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
+	MainCamera->SetPostProcessBlendWeight(0.0f);
+	MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
 
 }
 
@@ -147,7 +147,6 @@ void APossessor::BeginPlay()
 	Super::BeginPlay();
 
 	//create widget reference.
-
 
 	DropSound->Stop();
 	OneCorrectSound->Stop();
@@ -510,9 +509,11 @@ void APossessor::InstantDrop()
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockSprite(0);
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->ChangeColor(0);
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->BlockHitBox->SetMobility(EComponentMobility::Stationary);
-	
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetArrowVisibility(0);
+
 		grid->GetBlock(OldGhostPositions[i])->SetBlockStatus(2);
 		grid->GetBlock(OldGhostPositions[i])->SetBlockSprite(2);
+		grid->GetBlock(OldGhostPositions[i])->SetArrowVisibility(0);
 
 		CurrentTetromino->blocks[i]->SetPosition(OldGhostPositions[i]);
 		CurrentTetromino->blocks[i]->SetActorLocation(CurrentTetromino->blocks[i]->GetDimensions().X * FVector(OldGhostPositions[i].X, 0, OldGhostPositions[i].Y));
@@ -641,6 +642,7 @@ void APossessor::SaveTetromino()
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetBlockSprite(0);
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetColor("empty");
 		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->ChangeColor(0);
+		grid->GetBlock(CurrentTetromino->blocks[i]->GetPosition())->SetArrowVisibility(0);
 		CurrentTetromino->blocks[i]->Destroy();
 		CurrentTetromino->blocks[i] = nullptr;
 	}
