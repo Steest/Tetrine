@@ -217,7 +217,7 @@ public:
 	int GetMultiplier();
 	void CalculateMultiplier();
 	void UpdateRowDeletion();
-	FLinearColor GetNewUIColor(int8 level);
+	FColor GetNewUIColor(int8 level);
 	bool IsRowDeletionAnimFin(float deltaTime);
 	float SetUpRowsDestroyAnim(TArray<int8> rowsToDestroy);
 	void SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy);

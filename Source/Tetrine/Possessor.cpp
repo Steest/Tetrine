@@ -140,7 +140,7 @@ APossessor::APossessor()
 	MainCamera->SetPostProcessBlendWeight(0.0f);
 	MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
 
-	UIColor = FLinearColor::MakeRandomColor();
+	UIColor = GetNewUIColor(1);
 	bChangeUIColor = true;
 }
 
@@ -673,7 +673,7 @@ void APossessor::ChangeLevel()
 		LevelUpSound->Play();
 
 		bChangeUIColor = true;
-		UIColor = GetNewUIColor(int8 level);
+		UIColor = GetNewUIColor(level);
 	}
 	
 }
@@ -796,7 +796,7 @@ void APossessor::SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy)
 }
 
 
-FLinearColor APossessor::GetNewUIColor(int8 level)
+FColor APossessor::GetNewUIColor(int8 level)
 {
 	if (level % 10 == 0) { return FColor::FromHex("#E14B32"); } // square // red
 	else if (level % 10 == 1) { return FColor::FromHex("#3264E1"); } // t // blue
