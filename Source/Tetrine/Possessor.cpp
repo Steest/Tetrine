@@ -798,14 +798,13 @@ void APossessor::SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy)
 
 FColor APossessor::GetNewUIColor(int8 level)
 {
-	if (level % 10 == 0) { return FColor::FromHex("#E14B32"); } // square // red
-	else if (level % 10 == 1) { return FColor::FromHex("#3264E1"); } // t // blue
-	else if (level % 10 == 2) { return  FColor::FromHex("#19C819"); } // z // green
-	else if (level % 10 == 3) { return FColor::FromHex("#FA9619"); } // s //orange
-	else if (level % 10 == 4) { return FColor::FromHex("#E1E119"); } // right bicep // yellow
-	else if (level % 10 == 5) { return FColor::FromHex("#7D32FA"); } // flat // purple
-	else if (level % 10 == 6) { return FColor::FromHex("#FA32C8"); } // left bicep // pink
-	else if (level % 10 == 7) { return FColor::FromHex("#FFFFFF"); } // remove all colors
-	else if (level % 10 == 8) { return FColor::FromHex("#000000"); }
+	if (level % 9 == 0) { return FColor::FromHex("#E14B32"); } // square // red
+	else if (level % 9 == 1) { return FColor::FromHex("#3264E1"); } // t // blue
+	else if (level % 9 == 2) { return  FColor::FromHex("#19C819"); } // z // green
+	else if (level % 9 == 3) { return FColor::FromHex("#FA9619"); } // s //orange
+	else if (level % 9 == 4) { return FColor::FromHex("#E1E119"); } // right bicep // yellow
+	else if (level % 9 == 5) { return FColor::FromHex("#7D32FA"); } // flat // purple
+	else if (level % 9 == 6) { return FColor::FromHex("#FA32C8"); } // left bicep // pink
+	else if (level % 9 == 7) { return FColor::FromHex("#FFFFFF"); } // remove all colors
 	else { return FColor::FromHex("#32E1FA"); } // turqouise-ish
 }
