@@ -140,6 +140,8 @@ APossessor::APossessor()
 	MainCamera->SetPostProcessBlendWeight(0.0f);
 	MainCamera->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = 0.0f;
 
+	UIColor = GetNewUIColor(1);
+	bChangeUIColor = true;
 }
 
 void APossessor::BeginPlay()
@@ -669,6 +671,9 @@ void APossessor::ChangeLevel()
 		SpawnScoreBox( FString::FromInt(level-GetLevel()), LevelUpgradeLocation);
 		SetLevel(level);
 		LevelUpSound->Play();
+
+		bChangeUIColor = true;
+		UIColor = GetNewUIColor(level);
 	}
 	
 }
@@ -788,4 +793,19 @@ void APossessor::SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy)
 			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->AddWorldOffset(FVector(0.0f, -10.0f, 0.0f));
 		}
 	}
+}
+
+
+FColor APossessor::GetNewUIColor(int8 level)
+{
+	if (level % 10 == 0) { return FColor::FromHex("#E14B32"); } // square // red
+	else if (level % 10 == 1) { return FColor::FromHex("#3264E1"); } // t // blue
+	else if (level % 10 == 2) { return  FColor::FromHex("#19C819"); } // z // green
+	else if (level % 10 == 3) { return FColor::FromHex("#FA9619"); } // s //orange
+	else if (level % 10 == 4) { return FColor::FromHex("#E1E119"); } // right bicep // yellow
+	else if (level % 10 == 5) { return FColor::FromHex("#7D32FA"); } // flat // purple
+	else if (level % 10 == 6) { return FColor::FromHex("#FA32C8"); } // left bicep // pink
+	else if (level % 10 == 7) { return FColor::FromHex("#FFFFFF"); } // remove all colors
+	else if (level % 10 == 8) { return FColor::FromHex("#000000"); }
+	else { return FColor::FromHex("#32E1FA"); } // turqouise-ish
 }

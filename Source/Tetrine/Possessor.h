@@ -148,6 +148,10 @@ public:
 	bool bStartUILandedAnim;
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	bool bStartUISavedAnim;
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	FLinearColor UIColor;
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	bool bChangeUIColor;
 
 	UPROPERTY(EditAnywhere, Category = "Game")
 	float FinalFallTL;
@@ -213,6 +217,7 @@ public:
 	int GetMultiplier();
 	void CalculateMultiplier();
 	void UpdateRowDeletion();
+	FColor GetNewUIColor(int8 level);
 	bool IsRowDeletionAnimFin(float deltaTime);
 	float SetUpRowsDestroyAnim(TArray<int8> rowsToDestroy);
 	void SetDownRowsDestroyAnim(TArray<int8> rowsToDestroy);
