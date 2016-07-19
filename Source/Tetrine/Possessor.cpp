@@ -581,6 +581,7 @@ void APossessor::CalculateArrowSequence()
 	ArrowSequence.Empty();
 	ArrowSequencePosition.X = 0;
 	TArray<int8> rowsToExtract = FilterForDeletion(CurrentTetromino->GetTetrominoRows());
+	rowsToExtract.Sort();
 	MapTetrominoArrows(); // grid has "none" as arrow direction for some parts, need to map tetro to grid
 	for (int i = 0; i < rowsToExtract.Num(); ++i)
 	{
@@ -592,7 +593,7 @@ void APossessor::CalculateArrowSequence()
 		ArrowSequencePosition.Y = rowsToExtract[i];
 		break; // only need one row
 	}
-	grid->SetRowColor("grey",ArrowSequencePosition.Y);
+	grid->SetRowColor("white",ArrowSequencePosition.Y);
 }
 
 TArray<FString> APossessor::GetArrowSequence()
@@ -618,7 +619,7 @@ void APossessor::UpdateArrowMiniTimerBar()
 	TickedBlocksToColor = blocksToColor;
 	for (int i = 0; i < blocksToColor; ++i)
 	{
-		grid->GetBlock(FVector2D(i, ArrowSequencePosition.Y))->ChangeColor("pink");
+		grid->GetBlock(FVector2D(i, ArrowSequencePosition.Y))->ChangeColor("grey");
 		TickSound->Play();
 	}
 }

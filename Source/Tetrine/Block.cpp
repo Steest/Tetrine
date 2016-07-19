@@ -142,7 +142,8 @@ void ABlock::ChangeColor(FString color)
 	else if (color == "yellow") { newColor = FColor::FromHex("#E1E119"); } // right bicep
 	else if (color == "purple") { newColor = FColor::FromHex("#7D32FA"); } // flat
 	else if (color == "pink") { newColor = FColor::FromHex("#FA32C8"); } // left bicep
-	else if (color == "grey" || color == "white" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
+	else if (color == "grey") { newColor = FColor::FromHex("#676A6B"); } // used for arrow mini
+	else if (color == "white" || color == "empty" || color == "none") { newColor = FColor::FromHex("#FFFFFF"); } // remove all colors
 	else if (color == "black") { newColor = FColor::FromHex("#000000"); }
 	else { newColor = FColor::FromHex("#32E1FA"); } // turqouise-ish
 	//UE_LOG(MyLog, All,TEXT("My color is %s"),*newColor.ToString());
