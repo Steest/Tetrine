@@ -26,7 +26,7 @@ APossessor::APossessor()
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightArrowAsset(TEXT("PaperSprite'/Game/Art/Highlight2Arrow_Sprite.Highlight2Arrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> HighlightRowAsset(TEXT("PaperSprite'/Game/Art/HighlightArrow_Sprite.HighlightArrow_Sprite'"));
 	ConstructorHelpers::FObjectFinderOptional<UPaperSprite> ArrowSpriteAsset(TEXT("PaperSprite'/Game/Art/Arrow_Sprite.Arrow_Sprite'"));
-	ConstructorHelpers::FObjectFinderOptional<UPaperFlipbook> BlockDestroyAnimAsset(TEXT("PaperFlipbook'/Game/Art/BlockDestroyAnimation/BlockDestroyAnim.BlockDestroyAnim'"));
+	ConstructorHelpers::FObjectFinderOptional<UPaperFlipbook> BlockDestroyAnimAsset(TEXT("PaperFlipbook'/Game/Art/RowDestroyAnim/BlockDestroyAnim.BlockDestroyAnim'"));
 
 	GhostSprite = GhostSpriteAsset.Get();
 	HighlightArrowSprite = HighlightArrowAsset.Get();
@@ -778,7 +778,7 @@ float APossessor::SetUpRowsDestroyAnim(TArray<int8> rowsToDestroy)
 			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->SetFlipbook(BlockDestroyAnim, 0);
 			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->AddWorldOffset(FVector(0.0f, 10.0f, 0.0f));
 			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->Stop();
-			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->Play();
+			grid->GetBlock(FVector2D(j, rowsToDestroy[i]))->BlockDestroyAnim->PlayFromStart();
 		}
 	}
 	return BlockDestroyAnim->GetTotalDuration(); 
