@@ -25,13 +25,15 @@ ABlock::ABlock()
 	// arrow sprite 
 	ArrowSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ArrowSprite"));
 	ArrowSprite->SetSprite(ArrowSpriteAsset.Object);
-	ArrowSprite->AttachTo(BlockHitBox);
+	ArrowSprite->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	//ArrowSprite->AttachTo(BlockHitBox);
 	ArrowSprite->SetVisibility(false);
 	ArrowSprite->AddWorldOffset(FVector(0.0f, 1.0f, 0.0f));
 
 	// anim destroy
 	BlockDestroyAnim = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("BlockDestroyAnim"));
-	BlockDestroyAnim->AttachTo(RootComponent);
+	//BlockDestroyAnim->AttachTo(RootComponent);
+	BlockDestroyAnim->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	BlockDestroyAnim->SetVisibility(false);
 
 	BlockStatus = 0;
@@ -96,7 +98,7 @@ FVector2D ABlock::GetPosition()
 
 FVector2D ABlock::GetDimensions()
 {
-	return BlockHitBox->GetSprite()->GetSourceSize();
+	return FVector2D(300.0f, 300.0f); //BlockHitBox->GetSprite()->GetSourceSize();
 }
 
 void ABlock::SetBlockSprite(int8 blockStatus)
